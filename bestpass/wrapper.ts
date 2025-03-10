@@ -17,34 +17,13 @@ class Http {
     return this;
   }
 
-  stringToMethod(method: string): HttpMethods {
-    let httpMethod: HttpMethods;
-
-    switch (method.toLowerCase()) {
-      case "get":
-        httpMethod = 'GET';
-        break;
-      case "put":
-        httpMethod = 'PUT';
-        break;
-      case "post":
-        httpMethod = 'POST';
-        break;
-      case "delete":
-        httpMethod = 'DELETE';
-        break;
-    }
-
-    return httpMethod;
-  }
-
   serve() {
     Deno.serve(async (req) => {
       try {
         const url = new URL(req.url);
         let filePath = "./bestpass/public" + decodeURIComponent(url.pathname);
 
-        const method = 
+        const method = req.method as HttpMethods;
 
         this.handlers[method][url.pathname](req);
 
@@ -67,4 +46,4 @@ class Http {
 }
 
 
-type HttpMethods = 'GET' | 'POST' | 'PUT' | 'DELETE';
+type HttpMethods = "GET" | "POST" | "PUT" | "DELETE";
