@@ -1,16 +1,24 @@
+import { serveFile } from "https://deno.land/std@0.192.0/http/file_server.ts";
+
 Deno.serve(async (req) => {
-  console.log("Method:", req.method);
+  console.log("Incoming request:", req.method, req.url);
 
-  const url = new URL(req.url);
-  console.log("Path:", url.pathname);
-  console.log("Query parameters:", url.searchParams);
+  try {
+    const url = new URL(req.url);
+    let filePath = "./bestpass/public" + decodeURIComponent(url.pathname);
 
-  console.log("Headers:", req.headers);
+    // Serve index.html for the root path
+    if (url.pathname === "/") {
+      filePath = "./bestpass/public/index.html";
+    }
 
-  if (req.body) {
-    const body = await req.text();
-    console.log("Body:", body);
+    console.log("Serving file:", filePath);
+
+    const response = await serveFile(req, filePath);
+    console.log("File served successfully:", filePath);
+    return response;
+  } catch (error) {
+    console.error("Error serving file:", error);
+    return new Response("404 Not Found", { status: 404 });
   }
-
-  return new Response("Hello, World!");
 });
