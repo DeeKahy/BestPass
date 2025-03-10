@@ -1,49 +1,61 @@
 import { serveFile } from "https://deno.land/std@0.192.0/http/file_server.ts";
 
-class Http {
-  handlers: Record<HttpMethods, Record<string, (req: Request) => void>>;
+export class Http {
+  handlers: Record<HttpMethods, Record<string, (req: Request) => Response>>;
+  staticDir: string;
 
-  constructor() {
+  constructor(staicDir: string) {
     this.handlers = {
       GET: {},
       POST: {},
       PUT: {},
       DELETE: {},
     };
+    this.staticDir = staicDir;
   }
 
-  addRoute(method: HttpMethods, path: string, handler: (req: Request) => void): Http {
+  addRoute(method: HttpMethods, path: string, handler: (req: Request) => Response): Http {
     this.handlers[method][path] = handler;
     return this;
   }
 
+  async serveStaticFile(req: Request, filePath: string): Promise<Response> {
+    try {
+      const response = await serveFile(req, filePath);
+      console.log("File served successfully:", filePath);
+      return response;
+    } catch (error) {
+      console.error("Error serving file.", error);
+      return new Response("404 Not Found", { status: 404 });
+    }
+  }
+
   serve() {
     Deno.serve(async (req) => {
+      const url = new URL(req.url);
+      const method = req.method as HttpMethods;
+      
+      const handler = this.handlers[method][url.pathname];
+      if (handler) {
+        return handler(req);
+      }
+      
+      const filePath = `${this.staticDir}${decodeURIComponent(url.pathname)}`;
+      const isRootPath = url.pathname === "/";
+      const staticFilePath = isRootPath ? `${this.staticDir}/index.html` : filePath;
+
       try {
-        const url = new URL(req.url);
-        let filePath = "./bestpass/public" + decodeURIComponent(url.pathname);
-
-        const method = req.method as HttpMethods;
-
-        this.handlers[method][url.pathname](req);
-
-        // Serve index.html for the root path
-        if (url.pathname === "/") {
-          filePath = "./bestpass/public/index.html";
+        const fileInfo = await Deno.stat(staticFilePath);
+        if (fileInfo.isFile) {
+          return await this.serveStaticFile(req, staticFilePath);
         }
-
-        console.log("Serving file:", filePath);
-
-        const response = await serveFile(req, filePath);
-        console.log("File served successfully:", filePath);
-        return response;
       } catch (error) {
         console.error("Error serving file:", error);
-        return new Response("404 Not Found", { status: 404 });
       }
+      
+      return new Response("404 Not Found", { status: 404 });
     });
   }
 }
-
 
 type HttpMethods = "GET" | "POST" | "PUT" | "DELETE";
