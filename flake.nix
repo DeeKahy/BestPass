@@ -19,7 +19,12 @@
             pkgs.deno
           ];
 
-          shellHook = '''';
+          shellHook = ''
+          run() {
+            deno run --allow-all --watch ./bestpass/main.ts
+          }
+          run
+          '';
         };
       });
 }
