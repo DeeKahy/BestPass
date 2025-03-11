@@ -1,0 +1,9 @@
+providers = ['deno']
+ buildImage = 'ghcr.io/railwayapp/nixpacks:ubuntu-1741046653'
+ 
+ [variables]
+ NIXPACKS_METADATA = 'deno'
+ [phases.setup]
+ nixPkgs = ['deno','sqlite']
+ nixOverlays = []
+ nixpkgsArchive = '5148520bfab61f99fd25fb9ff7bfbb50dad3c9db'
