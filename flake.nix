@@ -15,8 +15,9 @@
       in
       {
         devShell = pkgs.mkShell {
-          buildInputs = [
-            pkgs.deno
+          buildInputs = with pkgs; [
+            deno
+            sqlite
           ];
 
           shellHook = ''
