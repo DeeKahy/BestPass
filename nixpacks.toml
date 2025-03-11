@@ -3,7 +3,7 @@ buildImage = 'ghcr.io/railwayapp/nixpacks:ubuntu-1737417843'
 
 [phases.install]
 dependsOn = ['setup']
-cmds = [deno install --entrypoint /bestpass/main.ts']
+cmds = ['deno install --entrypoint /bestpass/main.ts']
 
 [phases.setup]
 nixPkgs = [
