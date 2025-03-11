@@ -1,0 +1,19 @@
+providers = []
+buildImage = 'ghcr.io/railwayapp/nixpacks:ubuntu-1737417843'
+
+[phases.install]
+dependsOn = ['setup']
+cmds = [deno install --entrypoint /bestpass/main.ts']
+
+[phases.setup]
+nixPkgs = [
+    'deno',
+    'sqlite'
+]
+nixLibs = [
+]
+nixOverlays = []
+nixpkgsArchive = 'bc8f8d1be58e8c8383e683a06e1e1e57893fff87'
+
+[start]
+cmd = 'deno run --no-lock --allow-all ./bestpass/main.ts'
