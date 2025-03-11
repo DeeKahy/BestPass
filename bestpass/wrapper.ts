@@ -1,7 +1,7 @@
 import { serveFile } from "https://deno.land/std@0.192.0/http/file_server.ts";
 
 export class Http {
-  handlers: Record<HttpMethods, Record<string, (req: Request) => Response>>;
+  handlers: Record<HttpMethods, Record<string, (req: Request) => Promise<Response>>>;
   staticDir: string;
 
   constructor(staicDir: string) {
@@ -14,7 +14,7 @@ export class Http {
     this.staticDir = staicDir;
   }
 
-  addRoute(method: HttpMethods, path: string, handler: (req: Request) => Response): Http {
+  addRoute(method: HttpMethods, path: string, handler: (req: Request) => Promise<Response>): Http {
     this.handlers[method][path] = handler;
     return this;
   }
@@ -41,13 +41,11 @@ export class Http {
       }
       
       const filePath = `${this.staticDir}${decodeURIComponent(url.pathname)}`;
-      const isRootPath = url.pathname === "/";
-      const staticFilePath = isRootPath ? `${this.staticDir}/index.html` : filePath;
 
       try {
-        const fileInfo = await Deno.stat(staticFilePath);
+        const fileInfo = await Deno.stat(filePath);
         if (fileInfo.isFile) {
-          return await this.serveStaticFile(req, staticFilePath);
+          return await this.serveStaticFile(req, filePath);
         }
       } catch (error) {
         console.error("Error serving file:", error);
