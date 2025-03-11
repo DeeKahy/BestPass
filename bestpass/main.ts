@@ -1,5 +1,6 @@
 import { serveFile } from "https://deno.land/std@0.192.0/http/file_server.ts";
 import { DB } from "https://deno.land/x/sqlite@v3.7.0/mod.ts";
+import { Http } from "./wrapper.ts";
 
 // Initialize database connection
 const db = new DB("password_manager.db");
@@ -22,25 +23,13 @@ db.execute(`
   );
 `);
 
-Deno.serve(async (req) => {
-  console.log("Incoming request:", req.method, req.url);
+const server = new Http("./bestpass/public");
 
-  try {
-    const url = new URL(req.url);
-    let filePath = "./bestpass/public" + decodeURIComponent(url.pathname);
+server
+  .addRoute("GET", "/api/data", (_req) => {
+    return new Response(JSON.stringify({ message: "Hello, World!"}), {
+      headers: { "content-type": "application/json"},
+    });
+  })
+  .serve();
 
-    // Serve index.html for the root path
-    if (url.pathname === "/") {
-      filePath = "./bestpass/public/index.html";
-    }
-
-    console.log("Serving file:", filePath);
-
-    const response = await serveFile(req, filePath);
-    console.log("File served successfully:", filePath);
-    return response;
-  } catch (error) {
-    console.error("Error serving file:", error);
-    return new Response("404 Not Found", { status: 404 });
-  }
-});

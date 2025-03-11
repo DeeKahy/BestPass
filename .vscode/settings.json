@@ -1,3 +1,4 @@
 {
-    "deno.enable": true
+    "deno.enable": true,
+    "deno.path": "/nix/store/ixxpyaqcjlmpr8f0k4lzhmcjzlavfpsd-deno-2.2.2/bin/deno"
 }
