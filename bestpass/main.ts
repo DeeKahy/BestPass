@@ -1,11 +1,11 @@
 import { serveFile } from "https://deno.land/std@0.192.0/http/file_server.ts";
-import { DatabaseSync } from "node:sqlite";
+import { DB } from "https://deno.land/x/sqlite@v3.7.0/mod.ts";
 
 // Initialize database connection
-const db = new DatabaseSync("password_manager.db");
+const db = new DB("password_manager.db");
 
 // Create tables if they don't exist
-db.exec(`
+db.execute(`
   CREATE TABLE IF NOT EXISTS users (
     email VARCHAR PRIMARY KEY,
     username VARCHAR NOT NULL,
@@ -21,7 +21,6 @@ db.exec(`
     FOREIGN KEY (user_email) REFERENCES users(email)
   );
 `);
-
 
 Deno.serve(async (req) => {
   console.log("Incoming request:", req.method, req.url);
