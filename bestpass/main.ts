@@ -1,5 +1,4 @@
-import { serveFile } from "https://deno.land/std@0.192.0/http/file_server.ts";
-import { DB } from "https://deno.land/x/sqlite@v3.7.0/mod.ts";
+import { DB } from "https://deno.land/x/sqlite@v3.9.0/mod.ts";
 import { Http } from "./wrapper.ts";
 
 // Initialize database connection
