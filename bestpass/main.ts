@@ -74,19 +74,21 @@ server
     const email = body.get("email");
     const password = body.get("password");
   
-   const result = await server.db.query('SELECT email,master_password from users where users.email=?', [email]) as User;
+   const result = await server.db.query('SELECT master_password from users where users.email=?', [email]);
    console.log(result);
-   const resultemail = result[0][0];
-   const resultpassword = result[0][1];
-    
-   if (password == resultpassword){
-     console.log("password correct");
-    } else {
-    console.log("password wrong");
+   console.log(typeof(result));
+   
+   if (!(Object.keys(result).length === 0)){
+     const resultpassword = result[0][0];
+     if (password == resultpassword){
+       console.log("password correct");
+      } else {
+      console.log("password wrong");
+     }
+   } else {
+    console.log("cant find email :(")
    }
-    
     return new Response("200");
-
   })
   .serve();
 
