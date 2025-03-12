@@ -1,6 +1,5 @@
 import { generateToken, genereateGuestToken } from "./jwt/jwt.ts";
 import { Http } from "./wrapper.ts";
-import { User } from "./acm/permission.ts";
 import { getUserByEmail } from "./db/db_user.ts";
 
 const server = new Http("./bestpass/public");
@@ -123,7 +122,6 @@ server
       // Create the complete HTML structure
       let html = `
       <ul class="list bg-base-100 rounded-box shadow-md">
-        <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Logins</li>
       `;
 
       // Add each login as a list item
