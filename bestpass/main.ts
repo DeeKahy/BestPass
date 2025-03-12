@@ -75,8 +75,6 @@ server
     const password = body.get("password");
   
    const result = await server.db.query('SELECT master_password from users where users.email=?', [email]);
-   console.log(result);
-   console.log(typeof(result));
    
    if (!(Object.keys(result).length === 0)){
      const resultpassword = result[0][0];
