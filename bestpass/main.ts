@@ -19,7 +19,71 @@ server
       headers: { "content-type": "text/html"},
     });
   })
-
+  .addRoute("POST", "/api/savenewpassword", async (req) => {
+    try {
+      // Get form data from the request
+      const formData = await req.formData();
+  
+      // Extract password data from the form
+      const user_email = formData.get("user_email");
+      const website = formData.get("website");
+      const username = formData.get("username");
+      const password = formData.get("password");
+  
+      // Validate required fields
+      if (!user_email || !password) {
+        return new Response(`
+          <div class="alert alert-error">
+            <span>User email and password are required</span>
+          </div>
+        `, {
+          headers: { "content-type": "text/html" }
+        });
+      }
+  
+      // Check if user exists
+      const userExists = server.db.query(
+        "SELECT email FROM users WHERE email = ?", 
+        [user_email]
+      ).length > 0;
+  
+      if (!userExists) {
+        return new Response(`
+          <div class="alert alert-error">
+            <span>User does not exist</span>
+          </div>
+        `, {
+          headers: { "content-type": "text/html" }
+        });
+      }
+  
+      // Insert the new password into the database
+      server.db.query(
+        "INSERT INTO passwords (user_email, website, username, password) VALUES (?, ?, ?, ?)",
+        [user_email, website || null, username || null, password]
+      );
+  
+      // Return success response
+      return new Response(`
+        <div class="alert alert-success">
+          <span>Password saved successfully</span>
+        </div>
+      `, {
+        headers: { "content-type": "text/html" }
+      });
+    } catch (error) {
+      console.error("Error saving password:", error);
+  
+      // Return error response
+      return new Response(`
+        <div class="alert alert-error">
+          <span>Failed to save password</span>
+        </div>
+      `, {
+        headers: { "content-type": "text/html" }
+      });
+    }
+  })
   .addRoute("GET", "/api/logins", async (_req) => {
     try {
       // Query all passwords from the database
