@@ -1,6 +1,6 @@
 import { generateToken, genereateGuestToken } from "./jwt/jwt.ts";
 import { Http } from "./wrapper.ts";
-import { User } from "./acm/permission.ts"
+import { User } from "./acm/permission.ts";
 const server = new Http("./bestpass/public");
 
 server
@@ -11,10 +11,13 @@ server
     if (!token) {
       const guestToken = genereateGuestToken();
       const headers = new Headers({
-        'Set-Cookie': `jwt=${guestToken}; HttpOnly; Secure; Path=/`,
+        "Set-Cookie": `jwt=${guestToken}; HttpOnly; Secure; Path=/`,
       });
 
-      const response = await server.serveStaticFile(req, "./bestpass/public/index.html");
+      const response = await server.serveStaticFile(
+        req,
+        "./bestpass/public/index.html",
+      );
       for (const [key, value] of headers.entries()) {
         response.headers.set(key, value);
       }
@@ -22,34 +25,34 @@ server
     }
 
     // If token exists it just serves the static file like normal
-    return await server.serveStaticFile(req, "./bestpass/public/index.html")
+    return await server.serveStaticFile(req, "./bestpass/public/index.html");
   })
   .addRoute("GET", "/api/data", async (_req) => {
-    return await new Response(JSON.stringify({ message: "Hello, World!"}), {
-      headers: { "content-type": "application/json"},
+    return await new Response(JSON.stringify({ message: "Hello, World!" }), {
+      headers: { "content-type": "application/json" },
     });
   })
   .addRoute("GET", "/api/username", async (_req) => {
     return await new Response("<span>Hello, World!</span>", {
-      headers: { "content-type": "text/html"},
+      headers: { "content-type": "text/html" },
     });
   })
   .addRoute("GET", "/api/logins", async (_req) => {
     try {
       // Query all passwords from the database
       const logins = server.db.query("SELECT * FROM passwords");
-  
+
       // Create the complete HTML structure
       let html = `
       <ul class="list bg-base-100 rounded-box shadow-md">
         <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Logins</li>
       `;
-  
+
       // Add each login as a list item
       for (const login of logins) {
-        const website = login[2] || 'No website';
-        const username = login[3] || 'No username';
-  
+        const website = login[2] || "No website";
+        const username = login[3] || "No username";
+
         html += `
         <li class="list-row align-right">
           <div>
@@ -66,42 +69,49 @@ server
         </li>
         `;
       }
-  
+
       // Close the list
       html += `</ul>`;
-  
+
       return await new Response(html, {
-        headers: { "content-type": "text/html"},
+        headers: { "content-type": "text/html" },
       });
     } catch (error) {
       console.error("Error fetching logins:", error);
       return await new Response("<div>Error loading logins</div>", {
-        headers: { "content-type": "text/html"},
-        status: 500
+        headers: { "content-type": "text/html" },
+        status: 500,
       });
     }
   })
   .addRoute("POST", "/login", async (req) => {
-    const body = await req.formData(); 
+    const body = await req.formData();
     console.log(body);
     const email = body.get("email");
     const password = body.get("password");
-  
-   const result = await server.db.query('SELECT master_password from users where users.email=?', [email]);
-   console.log(result);
-   console.log(typeof(result));
-   
-   if (!(Object.keys(result).length === 0)){
-     const resultpassword = result[0][0];
-     if (password == resultpassword){
-       console.log("password correct");
+
+    // Ensure that email and password are strings
+    if (typeof email !== "string" || typeof password !== "string") {
+      return new Response("Invalid email or password format", { status: 400 });
+    }
+
+    const result = await server.db.query(
+      "SELECT master_password from users where users.email=?",
+      [email],
+    );
+    console.log(result);
+    console.log(typeof result);
+
+    if (!(Object.keys(result).length === 0)) {
+      const resultpassword = result[0][0];
+      if (password == resultpassword) {
+        console.log("password correct");
       } else {
-      console.log("password wrong");
-     }
-   } else {
-    console.log("cant find email :(")
-   }
+        console.log("password wrong");
+      }
+    } else {
+      console.log("cant find email :(");
+    }
     return new Response("200");
   })
   .serve();
-
