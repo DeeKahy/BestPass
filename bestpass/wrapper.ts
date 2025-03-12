@@ -73,6 +73,7 @@ export class Http {
   ): Promise<{ user: { email: string; username: string; role: Role } | null; response?: Response }> {
     const cookies = this.parseCookie(req);
     const token = cookies.jwt;
+    const url = new URL(req.url)
 
     if (token) {
       try {
@@ -80,11 +81,13 @@ export class Http {
         return { user: payload };
       } catch (error) {
         console.error("Invalid token:", error);
-        return { user: null, response: new Response("Unauthorized", { status: 401 }) };
+        const redirectUrl = `${url.origin}/login?redirect=${encodeURIComponent(url.pathname)}`;
+        return { user: null, response: Response.redirect(redirectUrl, 302) };
       }
     }
 
-    return { user: null };
+    const redirectUrl = `${url.origin}/login?redirect=${encodeURIComponent(url.pathname)}`;
+    return { user: null, response: Response.redirect(redirectUrl, 302) };
   }
 
   serve() {
