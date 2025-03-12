@@ -3,8 +3,9 @@ export type Permission = 'read' | 'write' | 'delete';
 export type Ressource = 'post' | 'comment'
 
 export type User = {
-    id: string;
-    name: string;
+    email: string;
+    username: string;
+    master_password: string;
     role: Role;
 }
 
