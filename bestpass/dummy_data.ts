@@ -28,28 +28,32 @@ try {
     email: "john.doe@example.com",
     username: "JohnDoe",
     master_password: "johnMasterPass",
+    role: "user",
   };
   const user2 = {
     email: "jane.smith@example.com",
     username: "JaneSmith",
     master_password: "janeMasterPass",
+    role: "user",
   };
 
   db.query(
-    "INSERT OR IGNORE INTO users (email, username, master_password) VALUES (?, ?, ?)",
+    "INSERT OR IGNORE INTO users (email, username, master_password, role) VALUES (?, ?, ?, ?)",
     [
       user1.email,
       user1.username,
       user1.master_password,
+      user1.role,
     ],
   );
 
   db.query(
-    "INSERT OR IGNORE INTO users (email, username, master_password) VALUES (?, ?, ?)",
+    "INSERT OR IGNORE INTO users (email, username, master_password, role) VALUES (?, ?, ?, ?)",
     [
       user2.email,
       user2.username,
       user2.master_password,
+      user2.role,
     ],
   );
 
