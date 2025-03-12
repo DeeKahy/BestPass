@@ -1,12 +1,27 @@
+import { generateToken, genereateGuestToken } from "./jwt/jwt.ts";
 import { Http } from "./wrapper.ts";
 
 const server = new Http("./bestpass/public");
 
-
-
-
 server
   .addRoute("GET", "/", async (req) => {
+    const cookies = server.parseCookie(req);
+    const token = cookies.jwt;
+
+    if (!token) {
+      const guestToken = genereateGuestToken();
+      const headers = new Headers({
+        'Set-Cookie': `jwt=${guestToken}; HttpOnly; Secure; Path=/`,
+      });
+
+      const response = await server.serveStaticFile(req, "./bestpass/public/index.html");
+      for (const [key, value] of headers.entries()) {
+        response.headers.set(key, value);
+      }
+      return response;
+    }
+
+    // If token exists it just serves the static file like normal
     return await server.serveStaticFile(req, "./bestpass/public/index.html")
   })
   .addRoute("GET", "/api/data", async (_req) => {
@@ -19,7 +34,6 @@ server
       headers: { "content-type": "text/html"},
     });
   })
-
   .addRoute("GET", "/api/logins", async (_req) => {
     try {
       // Query all passwords from the database
@@ -67,7 +81,6 @@ server
       });
     }
   })
-
   .addRoute("POST", "/login", async (req) => {
     const body = await req.formData(); 
     console.log(body);
