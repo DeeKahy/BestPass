@@ -1,9 +1,9 @@
 import { assertEquals } from "@std/assert";
 import { hasRessourcePermission, authorizeRessource, Role, User, Permission } from "./permission.ts";
 
-const adminUser: User = { id: '1', name: 'Alice', role: 'admin' };
-const regularUser: User = { id: '2', name: 'Bob', role: 'user' };
-const guestUser: User = { id: '3', name: 'Charlie', role: 'guest' };
+const adminUser: User = { email: 'admin@example.com', username: 'Alice', master_password: '123', role: 'admin' };
+const regularUser: User = { email: 'regular@example.com', username: 'Bob', master_password: '123', role: 'user' };
+const guestUser: User = { email: 'guest@example.com', username: 'Charlie', master_password: '123', role: 'guest' };
 
 // Testing authroize
 // Admin

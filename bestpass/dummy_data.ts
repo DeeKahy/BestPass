@@ -10,7 +10,8 @@ try {
       CREATE TABLE IF NOT EXISTS users (
         email VARCHAR PRIMARY KEY,
         username VARCHAR NOT NULL,
-        master_password VARCHAR NOT NULL
+        master_password VARCHAR NOT NULL,
+        role VARCHAR NOT NULL 
       );
   
       CREATE TABLE IF NOT EXISTS passwords (
