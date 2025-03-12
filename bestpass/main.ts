@@ -11,5 +11,16 @@ server
       headers: { "content-type": "application/json"},
     });
   })
+  .addRoute("POST", "/login", async (req) => {
+    const body = await req.formData(); 
+    console.log(body);
+    const email = body.get("email");
+    const password = body.get("password");
+  
+   const result = await  'SELECT * from users where users.email=?'
+    
+
+    return new Response("200");
+  })
   .serve();
 
