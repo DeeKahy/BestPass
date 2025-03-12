@@ -66,7 +66,7 @@ server
         status: 500
       });
     }
-
+  })
   .addRoute("POST", "/login", async (req) => {
     const body = await req.formData(); 
     console.log(body);
