@@ -1,9 +1,16 @@
 import { serveFile } from "https://deno.land/std@0.192.0/http/file_server.ts";
 
+import { DB } from "https://deno.land/x/sqlite@v3.9.0/mod.ts";
+
+// Initialize database connection
+
+
+
 export class Http {
   handlers: Record<HttpMethods, Record<string, (req: Request) => Promise<Response>>>;
   staticDir: string;
 
+  db: DB;
   constructor(staicDir: string) {
     this.handlers = {
       GET: {},
@@ -12,6 +19,7 @@ export class Http {
       DELETE: {},
     };
     this.staticDir = staicDir;
+    this.db = new DB("password_manager.db");
   }
 
   addRoute(method: HttpMethods, path: string, handler: (req: Request) => Promise<Response>): Http {
