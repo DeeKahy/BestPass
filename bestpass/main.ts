@@ -70,12 +70,11 @@ server
 
   .addRoute("POST", "/login", async (req) => {
     const body = await req.formData(); 
-    console.log(body);
     const email = body.get("email");
     const password = body.get("password");
   
    const result = await server.db.query('SELECT master_password from users where users.email=?', [email]);
-   
+
    if (!(Object.keys(result).length === 0)){
      const resultpassword = result[0][0];
      if (password == resultpassword){
