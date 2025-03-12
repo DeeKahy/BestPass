@@ -22,6 +22,7 @@
 
           shellHook = ''
           run() {
+            deno run --allow-read --allow-write ./bestpass/dummy_data.ts
             deno run --allow-all --watch ./bestpass/main.ts
           }
           run
