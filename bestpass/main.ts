@@ -2,10 +2,6 @@ import { Http } from "./wrapper.ts";
 
 const server = new Http("./bestpass/public");
 
-import { DB } from "https://deno.land/x/sqlite@v3.9.0/mod.ts";
-
-// Initialize database connection
-const db = new DB("password_manager.db");
 
 
 
@@ -27,7 +23,7 @@ server
   .addRoute("GET", "/api/logins", async (_req) => {
     try {
       // Query all passwords from the database
-      const logins = db.query("SELECT * FROM passwords");
+      const logins = server.db.query("SELECT * FROM passwords");
   
       // Create the complete HTML structure
       let html = `
