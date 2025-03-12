@@ -11,5 +11,10 @@ server
       headers: { "content-type": "application/json"},
     });
   })
+  .addRoute("GET", "/api/username", async (_req) => {
+    return await new Response( "Hello, World!"}), {
+      headers: { "content-type": "text/plain"},
+    });
+  })
   .serve();
 
