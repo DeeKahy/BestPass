@@ -35,7 +35,7 @@ try {
   };
 
   db.query(
-    "INSERT OR IGNORE INTO users (email, username, master_password) VALUES (?, ?, ?)",
+    "INSERT OR IGNORE INTO users (email, username, master_password) VALUES (  ?, ?, ?)",
     [
       user1.email,
       user1.username,

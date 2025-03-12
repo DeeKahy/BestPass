@@ -10,23 +10,23 @@
 <div class="relative flex flex-col justify-center h-screen overflow-hidden">
     <div class="w-full p-6 m-auto bg-white rounded-md shadow-md lg:max-w-lg">
         <h1 class="text-3xl font-semibold text-center text-purple-700">BestPass</h1>
-        <form class="space-y-4">
+        <form class="space-y-4" action="/login" method="post">
             <div>
                 <label class="label">
                     <span class="text-base label-text">Email</span>
                 </label>
-                <input type="text" placeholder="Email Address" class="w-full input input-bordered input-primary" />
+                <input type="text" name="email" placeholder="Email Address" id="email" class="w-full input input-bordered input-primary" />
             </div>
             <div>
                 <label class="label">
                     <span class="text-base label-text">Password</span>
                 </label>
-                <input type="password" placeholder="Enter Password" class="w-full input input-bordered input-primary" />
+                <input type="password" name="password" placeholder="Enter Password" id="password" class="w-full input input-bordered input-primary" />
             </div>
             <a href="/forgotpassword.html" class="text-xs text-gray-600 hover:underline hover:text-blue-600">Forget Password?</a>
             <a href="/register.html" class="text-xs text-gray-600 hover:underline hover:text-blue-600">Register?</a>
             <div>
-                <button class="btn btn-primary">Login</button>
+                <button input type="submit" class="btn btn-primary">Login</button>
             </div>
         </form>
     </div>
