@@ -34,10 +34,10 @@ server
       headers: { "content-type": "text/html" },
     });
   }, true)
-  .addRoute("GET", "/api/logins", async (_req, _user) => {
+  .addRoute("GET", "/api/logins", async (_req, user) => {
     try {
       // Query all passwords from the database
-      const logins = server.db.query("SELECT * FROM passwords");
+      const logins = server.db.query("SELECT * FROM passwords where passwords.user_email=?", [user?.email]);
 
       // Create the complete HTML structure
       let html = `
