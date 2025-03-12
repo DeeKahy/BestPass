@@ -43,30 +43,48 @@
         </div>
       </div>
     </div>
-      
-      
+
+
     <!-- Open the modal using ID.showModal() method -->
     <button class="btn" onclick="my_modal_2.showModal()">Add login</button>
     <dialog id="my_modal_2" class="modal">
         <div class="modal-box">
-            <label class="input validator">
-                <input type="input" placeholder="Username" />
-            </label>
-            <label class="input validator">
-                <input type="input" placeholder="Password" />
-            </label>
-            <br />
-            <button class="btn btn-soft btn-primary">Save</button>
+            <form hx-post="/api/savenewpassword"
+                  hx-target="#notification-area"
+                  hx-swap="innerHTML"
+                  hx-on::after-request="if(event.detail.successful) {
+                    my_modal_2.close();
+                    this.reset();
+                    htmx.trigger(document.querySelector('[hx-get=\"/api/logins\"]'), 'load');
+                  }">
+                <label class="input validator mb-2">
+                    <input type="input" name="website" placeholder="Website" />
+                </label>
+                <label class="input validator mb-2">
+                    <input type="input" name="username" placeholder="Username" />
+                </label>
+                <label class="input validator mb-2">
+                    <input type="password" name="password" placeholder="Password" required />
+                </label>
+                <!-- Hidden field for user email - in a real app, this would be from the session -->
+                <input type="hidden" name="user_email" value="john.doe@example.com" />
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
         </div>
         <form method="dialog" class="modal-backdrop">
             <button>close</button>
         </form>
     </dialog>
-    
-    
+
+    <!-- Add a notification area for messages -->
+    <div id="notification-area" class="toast toast-top toast-end"></div>
+
+
     <ul class="list bg-base-100 rounded-box shadow-md">
-      
-      <li class="p-4 pb-2 text-xs opacity-60 tracking-wide"></li>
+
+      <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Logins</li>
       <div hx-get="/api/logins" hx-trigger="load" hx-swap="outerHTML">
         <li class="list-row">
           <div>
@@ -81,8 +99,8 @@
           </button>
         </li>
       </div>
-      
-      
+
+
     </ul>
   </body>
 </html>
