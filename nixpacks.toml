@@ -1,0 +1,9 @@
+[phases.setup]
+
+[phases.build]
+
+[phase.name]
+nixpkgsArchive = '66571c8e7d976816fdec05360533a7f6b9abefbe'
+
+[start]
+cmd = 'deno run --allow-all --no-lock ./bestpass/main.ts'
