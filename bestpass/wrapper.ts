@@ -27,7 +27,7 @@ export class Http {
     path: string,
     handler: (
       req: Request,
-      user?: { id: string; role: Role },
+      user?: { email: string; username: string; role: Role },
     ) => Promise<Response>,
     requireAuth: boolean = false,
   ): Http {
@@ -70,7 +70,7 @@ export class Http {
 
   async authMiddleware(
     req: Request,
-  ): Promise<{ user: { id: string; role: Role } | null; response?: Response }> {
+  ): Promise<{ user: { email: string; username: string; role: Role } | null; response?: Response }> {
     const cookies = this.parseCookie(req);
     const token = cookies.jwt;
 
@@ -80,6 +80,7 @@ export class Http {
         return { user: payload };
       } catch (error) {
         console.error("Invalid token:", error);
+        return { user: null, response: new Response("Unauthorized", { status: 401 }) };
       }
     }
 

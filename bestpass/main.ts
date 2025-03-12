@@ -6,7 +6,7 @@ import { getUserByEmail } from "./db/db_user.ts";
 const server = new Http("./bestpass/public");
 
 server
-  .addRoute("GET", "/", async (req) => {
+  .addRoute("GET", "/", async (req, _user) => {
     const cookies = server.parseCookie(req);
     const token = cookies.jwt;
 
@@ -28,18 +28,13 @@ server
 
     // If token exists it just serves the static file like normal
     return await server.serveStaticFile(req, "./bestpass/public/index.html");
-  })
-  .addRoute("GET", "/api/data", async (_req) => {
-    return await new Response(JSON.stringify({ message: "Hello, World!" }), {
-      headers: { "content-type": "application/json" },
-    });
-  })
-  .addRoute("GET", "/api/username", async (_req) => {
+  }, true)
+  .addRoute("GET", "/api/username", async (_req, _user) => {
     return await new Response("<span>Hello, World!</span>", {
       headers: { "content-type": "text/html" },
     });
-  })
-  .addRoute("GET", "/api/logins", async (_req) => {
+  }, true)
+  .addRoute("GET", "/api/logins", async (_req, _user) => {
     try {
       // Query all passwords from the database
       const logins = server.db.query("SELECT * FROM passwords");
@@ -85,8 +80,8 @@ server
         status: 500,
       });
     }
-  })
-  .addRoute("POST", "/login", async (req) => {
+  }, true)
+  .addRoute("POST", "/login", async (req, _user) => {
     const body = await req.formData();
     const email = body.get("email");
     const password = body.get("password");

@@ -20,7 +20,8 @@ try {
         website VARCHAR,
         username VARCHAR,
         password VARCHAR NOT NULL,
-        FOREIGN KEY (user_email) REFERENCES users(email)
+        FOREIGN KEY (user_email) REFERENCES users(email),
+        UNIQUE(user_email, website, username)
       );
     `);
 
@@ -66,7 +67,7 @@ try {
   };
   const password2 = {
     user_email: "john.doe@example.com",
-    website: "example2.com",
+    website: "example1.com",
     username: "user2",
     password: "pass456",
   };
