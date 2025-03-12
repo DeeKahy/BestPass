@@ -10,7 +10,8 @@ try {
       CREATE TABLE IF NOT EXISTS users (
         email VARCHAR PRIMARY KEY,
         username VARCHAR NOT NULL,
-        master_password VARCHAR NOT NULL
+        master_password VARCHAR NOT NULL,
+        role VARCHAR NOT NULL 
       );
   
       CREATE TABLE IF NOT EXISTS passwords (
@@ -27,28 +28,32 @@ try {
     email: "john.doe@example.com",
     username: "JohnDoe",
     master_password: "johnMasterPass",
+    role: "user",
   };
   const user2 = {
     email: "jane.smith@example.com",
     username: "JaneSmith",
     master_password: "janeMasterPass",
+    role: "user",
   };
 
   db.query(
-    "INSERT OR IGNORE INTO users (email, username, master_password) VALUES (  ?, ?, ?)",
+    "INSERT OR IGNORE INTO users (email, username, master_password, role) VALUES (?, ?, ?, ?)",
     [
       user1.email,
       user1.username,
       user1.master_password,
+      user1.role,
     ],
   );
 
   db.query(
-    "INSERT OR IGNORE INTO users (email, username, master_password) VALUES (?, ?, ?)",
+    "INSERT OR IGNORE INTO users (email, username, master_password, role) VALUES (?, ?, ?, ?)",
     [
       user2.email,
       user2.username,
       user2.master_password,
+      user2.role,
     ],
   );
 
