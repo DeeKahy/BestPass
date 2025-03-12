@@ -1,6 +1,11 @@
 providers = ['deno']
 buildImage = 'ghcr.io/railwayapp/nixpacks:ubuntu-1741046653'
 
+
+[start]
+cmd = 'deno run --allow-all --no-lock ./bestpass/main.ts'
+
+
 [variables]
 NIXPACKS_METADATA = 'deno'
 [phases.setup]
