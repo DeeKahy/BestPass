@@ -6,7 +6,7 @@ const db = new DB("password_manager.db");
 // Create tables if they don't exist
 try {
   // Create tables if they don't exist
-  db.execute(`
+  db.execute(`  
       CREATE TABLE IF NOT EXISTS users (
         email VARCHAR PRIMARY KEY,
         username VARCHAR NOT NULL,

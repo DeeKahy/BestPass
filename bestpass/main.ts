@@ -1,5 +1,5 @@
 import { Http } from "./wrapper.ts";
-
+import { User } from "./acm/permission.ts"
 const server = new Http("./bestpass/public");
 
 
@@ -73,9 +73,17 @@ server
     const email = body.get("email");
     const password = body.get("password");
   
-   const result = await  'SELECT * from users where users.email=?'
+   const result = await server.db.query('SELECT email,master_password from users where users.email=?', [email]) as User;
+   console.log(result);
+   const resultemail = result[0][0];
+   const resultpassword = result[0][1];
     
-
+   if (password == resultpassword){
+     console.log("password correct");
+    } else {
+    console.log("password wrong");
+   }
+    
     return new Response("200");
 
   })
