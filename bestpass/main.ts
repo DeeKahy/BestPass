@@ -1,6 +1,6 @@
 import { generateToken, genereateGuestToken } from "./jwt/jwt.ts";
 import { Http } from "./wrapper.ts";
-
+import { User } from "./acm/permission.ts"
 const server = new Http("./bestpass/public");
 
 server
@@ -87,11 +87,21 @@ server
     const email = body.get("email");
     const password = body.get("password");
   
-   const result = await  'SELECT * from users where users.email=?'
-    
-
+   const result = await server.db.query('SELECT master_password from users where users.email=?', [email]);
+   console.log(result);
+   console.log(typeof(result));
+   
+   if (!(Object.keys(result).length === 0)){
+     const resultpassword = result[0][0];
+     if (password == resultpassword){
+       console.log("password correct");
+      } else {
+      console.log("password wrong");
+     }
+   } else {
+    console.log("cant find email :(")
+   }
     return new Response("200");
-
   })
   .serve();
 
