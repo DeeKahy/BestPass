@@ -1,65 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
+    <title>BestPass</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 
-<h1 class="text-3xl font-bold mb-4">BeetPass</h1>
+    <link
+        href="https://cdn.jsdelivr.net/npm/daisyui@5"
+        rel="stylesheet"
+        type="text/css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  </head>
 
-
-<link
-    href="https://cdn.jsdelivr.net/npm/daisyui@5"
-    rel="stylesheet"
-    type="text/css"
-/>
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-<script src="https://unpkg.com/htmx.org@2.0.4"></script>
-
-  
-  
-<!-- Open the modal using ID.showModal() method -->
-<button class="btn" onclick="my_modal_2.showModal()">Add login</button>
-<dialog id="my_modal_2" class="modal">
-    <div class="modal-box">
-        <label class="input validator">
-            <input type="input" placeholder="Username" />
-        </label>
-        <label class="input validator">
-            <input type="input" placeholder="Password" />
-        </label>
-        <br />
-        <button class="btn btn-soft btn-primary">Save</button>
+  <body>
+  <!-- Nav bar -->
+    <div class="navbar bg-base-100 shadow-sm">
+      <div class="flex-1">
+        <a class="btn btn-ghost text-xl">BestPass</a>
+      </div>
+      <div class="flex gap-2">
+        <input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+            <div class="w-10 rounded-full">
+              <img
+                alt="Tailwind CSS Navbar component"
+                src="https://placehold.co/100x100" />
+            </div>
+          </div>
+          <ul
+            tabindex="0"
+            class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+            <li><a>Settings</a></li>
+            <li><a>Logout</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
-</dialog>
-
-
-<ul class="list bg-base-100 rounded-box shadow-md">
-  
-  <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Logins</li>
-  
-  <li class="list-row">
-    <div>
-      <div>Facebook.com</div>
-      <div class="text-xs opacity-60">example@example.com</div>
-    </div>
-    <button class="btn btn-square btn-ghost">
-      <svg class="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M6 3L20 12 6 21 6 3z"></path></g></svg>
-    </button>
-    <button class="btn btn-square btn-ghost">
-      <svg class="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
-    </button>
-  </li>
-  
-  <li class="list-row">
-    <div>
-      <div>Google.com</div>
-      <div class="text-xs opacity-60">example@example.com</div>
-    </div>
-    <button class="btn btn-square btn-ghost">
-      <svg class="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M6 3L20 12 6 21 6 3z"></path></g></svg>
-    </button>
-    <button class="btn btn-square btn-ghost">
-      <svg class="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
-    </button>
-  </li>
-  
-</ul>
+      
+      
+    <!-- Open the modal using ID.showModal() method -->
+    <button class="btn" onclick="my_modal_2.showModal()">Add login</button>
+    <dialog id="my_modal_2" class="modal">
+        <div class="modal-box">
+            <label class="input validator">
+                <input type="input" placeholder="Username" />
+            </label>
+            <label class="input validator">
+                <input type="input" placeholder="Password" />
+            </label>
+            <br />
+            <button class="btn btn-soft btn-primary">Save</button>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+    
+    
+    <ul class="list bg-base-100 rounded-box shadow-md">
+      
+      <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Logins</li>
+      
+      <li class="list-row">
+        <div>
+          <div>Facebook.com</div>
+          <div class="text-xs opacity-60">example@example.com</div>
+        </div>
+        <button class="btn btn-square btn-ghost">
+          <svg class="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M6 3L20 12 6 21 6 3z"></path></g></svg>
+        </button>
+        <button class="btn btn-square btn-ghost">
+          <svg class="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
+        </button>
+      </li>
+      
+      <li class="list-row">
+        <div>
+          <div>Google.com</div>
+          <div class="text-xs opacity-60">example@example.com</div>
+        </div>
+        <button class="btn btn-square btn-ghost">
+          <svg class="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M6 3L20 12 6 21 6 3z"></path></g></svg>
+        </button>
+        <button class="btn btn-square btn-ghost">
+          <svg class="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
+        </button>
+      </li>
+      
+    </ul>
+  </body>
+</html>
