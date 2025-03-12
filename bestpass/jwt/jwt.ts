@@ -9,8 +9,8 @@ export function generateToken(user: User): String {
   });
 }
 
-export function verifyToken(token: string): { id: string; role: Role } {
-  return jwt.verify(token, SECRET_KEY) as { id: string; role: Role };
+export function verifyToken(token: string): { email: string; username: string; role: Role } {
+  return jwt.verify(token, SECRET_KEY) as { email: string; username: string; role: Role };
 }
 
 export function genereateGuestToken(): string {

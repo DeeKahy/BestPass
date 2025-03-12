@@ -1,6 +1,8 @@
 import { generateToken, genereateGuestToken } from "./jwt/jwt.ts";
 import { Http } from "./wrapper.ts";
 import { User } from "./acm/permission.ts";
+import { getUserByEmail } from "./db/db_user.ts";
+
 const server = new Http("./bestpass/public");
 
 server
@@ -86,7 +88,6 @@ server
   })
   .addRoute("POST", "/login", async (req) => {
     const body = await req.formData();
-    console.log(body);
     const email = body.get("email");
     const password = body.get("password");
 
@@ -95,23 +96,29 @@ server
       return new Response("Invalid email or password format", { status: 400 });
     }
 
-    const result = await server.db.query(
-      "SELECT master_password from users where users.email=?",
-      [email],
-    );
-    console.log(result);
-    console.log(typeof result);
+    const user = await getUserByEmail(server.db, email);
 
-    if (!(Object.keys(result).length === 0)) {
-      const resultpassword = result[0][0];
-      if (password == resultpassword) {
+    if (user !== null) {
+      if (password == user.master_password) {
         console.log("password correct");
+        const token = generateToken(user);
+
+        const headers = new Headers({
+          'Set-Cookie': `jwt=${token}; HttpOnly; Secure; Path=/`,
+          'Location': '/',
+        });
+
+        return new Response(null, {
+          status: 302, // 302 redirect
+          headers,
+        });
       } else {
         console.log("password wrong");
+        return new Response("Invalid credentials", { status: 401 });
       }
     } else {
       console.log("cant find email :(");
+      return new Response("User not found", { status: 404 });
     }
-    return new Response("200");
   })
   .serve();
