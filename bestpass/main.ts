@@ -194,7 +194,7 @@ server
       return new Response("User not found", { status: 404 });
     }
   })
-  .addRoute("POST", "/logout", async (req, _user) => {
+  .addRoute("POST", "/api/logout", async (req, _user) => {
     // Clear the JWT cookie by setting it to an empty value and making it expire
     const headers = new Headers({
       'Set-Cookie': 'jwt=; HttpOnly; Secure; Path=/; Max-Age=0',
