@@ -55,7 +55,7 @@
                   hx-on::after-request="if(event.detail.successful) {
                     my_modal_2.close();
                     this.reset();
-                    htmx.trigger(document.querySelector('[hx-get=\"/api/logins\"]'), 'load');
+                    htmx.trigger(document.querySelector('[hx-get="/api/logins"]'), 'load');
                   }">
                 <label class="input validator mb-2">
                     <input type="input" name="website" placeholder="Website" />
@@ -85,7 +85,7 @@
     <ul class="list bg-base-100 rounded-box shadow-md">
 
       <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Logins</li>
-      <div hx-get="/api/logins" hx-trigger="load" hx-swap="outerHTML">
+      <div hx-get="/api/logins" hx-trigger="load once" hx-swap="outerHTML">
         <li class="list-row">
           <div>
             <div>Loading...</div>
