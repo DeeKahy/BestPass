@@ -26,9 +26,9 @@ try {
     `);
 
   const user1 = {
-    email: "john.doe@example.com",
-    username: "JohnDoe",
-    master_password: "johnMasterPass",
+    email: "$2a$10$08MriA2NPj9UI4QOBN63/ehDxFLRA3tjmHEPUiBctzG4G9mh8rwBW", // john.doe@example.com using bcrypt salt 10
+    username: "U2FsdGVkX1/Tz4B+kZxC73CZiEGjw49dfWQpKc6gjcE=", // JohnDoe using AES with master password johnMasterPass
+    master_password: "U2FsdGVkX1+gfXb3oUvQfLb6LhacIqGjW4JCzh9QXms=", // johnMasterPass using AES
     role: "user",
   };
   const user2 = {
