@@ -52,13 +52,14 @@ server
       headers: { "content-type": "text/html"},
     });
   })
-  .addRoute("POST", "/api/savenewpassword", async (req) => {
+  .addRoute("POST", "/api/savenewpassword", async (req, user) =>  {
+    
     try {
       // Get form data from the request
       const formData = await req.formData();
   
       // Extract password data from the form
-      const user_email = formData.get("user_email") as string;
+      const user_email = user?.email as string;
       const website = formData.get("website") as string | null;
       const username = formData.get("username") as string | null;
       const password = formData.get("password") as string;
@@ -116,7 +117,7 @@ server
         headers: { "content-type": "text/html" }
       });
     }
-  })
+  }, true)
   .addRoute("GET", "/api/logins", async (_req, user) => {
     try {
       // Query all passwords from the database
@@ -199,4 +200,16 @@ server
       return new Response("User not found", { status: 404 });
     }
   })
+  .addRoute("POST", "/api/logout", async (req, _user) => {
+    // Clear the JWT cookie by setting it to an empty value and making it expire
+    const headers = new Headers({
+      'Set-Cookie': 'jwt=; HttpOnly; Secure; Path=/; Max-Age=0',
+      'Location': '/login', // Redirect to login page
+    });
+
+    return new Response(null, {
+      status: 302, // 302 redirect
+      headers,
+    });
+  }, true)
   .serve();
