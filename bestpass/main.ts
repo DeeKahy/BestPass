@@ -5,29 +5,35 @@ import { getUserByEmail } from "./db/db_user.ts";
 const server = new Http("./bestpass/public");
 
 server
-  .addRoute("GET", "/", async (req, user) => {
+  .addRoute("GET", "/", async (req) => {
     const cookies = server.parseCookie(req);
     const token = cookies.jwt;
 
-    console.log(user)
-    const isAuthenticated = user?.role === "user" || user?.role === "admin";
-    const data = {
-      user: { isAuthenticated: isAuthenticated},
-    }
+    const { user } = await server.authMiddleware(req);
 
+    console.log(user)
+    
     if (!token) {
       const guestToken = genereateGuestToken();
       const headers = new Headers({
         "Set-Cookie": `jwt=${guestToken}; HttpOnly; Secure; Path=/`,
       });
 
+      const data = {
+        user: { isAuthenticated: false}
+      }
+      
       const response = await server.renderTemplate("index.eta", data);
       for (const [key, value] of headers.entries()) {
         response.headers.set(key, value);
       }
       return response;
     }
-
+    
+    const isAuthenticated = user?.role === "user" || user?.role === "admin";
+    const data = {
+      user: { isAuthenticated: isAuthenticated},
+    }
     // If token exists it just serves the static file like normal
     return await server.renderTemplate("index.eta", data);
   }, false)
