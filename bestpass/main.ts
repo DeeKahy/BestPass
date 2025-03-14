@@ -27,10 +27,13 @@ server
 
     // If token exists it just serves the static file like normal
     return await server.serveStaticFile(req, "./bestpass/public/index.html");
-  }, true)
+  }, false)
   .addRoute("GET", "/login", async (req) => {
-    return await server.serveStaticFile(req, "./bestpass/public/login.html")
+    return await server.serveStaticFile(req, "./bestpass/public/login.html");
   })
+  .addRoute("GET", "/passwords", async (req) => {
+    return await server.serveStaticFile(req, "./bestpass/public/passwords.html");
+  }, true)
   .addRoute("GET", "/api/username", async (_req, _user) => {
     return await new Response("<span>Hello, World!</span>", {
       headers: { "content-type": "text/html" },
@@ -176,7 +179,7 @@ server
       if (password == user.master_password) {
         console.log("password correct");
         const token = generateToken(user);
-        const redirectUrl = new URL(req.url).searchParams.get("redirect") || "/";
+        const redirectUrl = new URL(req.url).searchParams.get("redirect") || "/passwords";
 
         const headers = new Headers({
           'Set-Cookie': `jwt=${token}; HttpOnly; Secure; Path=/`,
