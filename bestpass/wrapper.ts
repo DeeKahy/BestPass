@@ -1,7 +1,8 @@
 import { serveFile } from "https://deno.land/std@0.192.0/http/file_server.ts";
 import { DB } from "https://deno.land/x/sqlite@v3.9.0/mod.ts";
+import { Eta } from "https://deno.land/x/eta@v3.5.0/src/index.ts";
 import { verifyToken } from "./jwt/jwt.ts";
-import { Role, User } from "./acm/permission.ts";
+import { Role } from "./acm/permission.ts";
 
 export class Http {
   handlers: Record<
@@ -10,16 +11,18 @@ export class Http {
   >;
   staticDir: string;
   db: DB;
+  eta: Eta;
 
-  constructor(staicDir: string) {
+  constructor(staticDir: string) {
     this.handlers = {
       GET: {},
       POST: {},
       PUT: {},
       DELETE: {},
     };
-    this.staticDir = staicDir;
+    this.staticDir = staticDir;
     this.db = new DB("password_manager.db");
+    this.eta = new Eta({views: `${staticDir}/views`})
   }
 
   addRoute(
@@ -35,7 +38,7 @@ export class Http {
       if (requireAuth) {
         const { user, response } = await this.authMiddleware(req);
         if (!user) {
-          return response || new Response("authorized", { status: 401 });
+          return response || new Response("Unauthorized", { status: 401 });
         }
         return handler(req, user);
       }
@@ -53,6 +56,13 @@ export class Http {
       console.error("Error serving file.", error);
       return new Response("404 Not Found", { status: 404 });
     }
+  }
+
+  renderTemplate(template: string, data: Record<string, unknown> = {}): Response {
+    const rendered = this.eta.render(template, data);
+    return new Response(rendered, {
+      headers: { "Content-Type": "text/html" },
+    });
   }
 
   parseCookie(req: Request): Record<string, string> {

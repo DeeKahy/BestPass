@@ -5,9 +5,15 @@ import { getUserByEmail } from "./db/db_user.ts";
 const server = new Http("./bestpass/public");
 
 server
-  .addRoute("GET", "/", async (req, _user) => {
+  .addRoute("GET", "/", async (req, user) => {
     const cookies = server.parseCookie(req);
     const token = cookies.jwt;
+
+    console.log(user)
+    const isAuthenticated = user?.role === "user" || user?.role === "admin";
+    const data = {
+      user: { isAuthenticated: isAuthenticated},
+    }
 
     if (!token) {
       const guestToken = genereateGuestToken();
@@ -15,10 +21,7 @@ server
         "Set-Cookie": `jwt=${guestToken}; HttpOnly; Secure; Path=/`,
       });
 
-      const response = await server.serveStaticFile(
-        req,
-        "./bestpass/public/index.html",
-      );
+      const response = await server.renderTemplate("index.eta", data);
       for (const [key, value] of headers.entries()) {
         response.headers.set(key, value);
       }
@@ -26,7 +29,7 @@ server
     }
 
     // If token exists it just serves the static file like normal
-    return await server.serveStaticFile(req, "./bestpass/public/index.html");
+    return await server.renderTemplate("index.eta", data);
   }, false)
   .addRoute("GET", "/login", async (req) => {
     return await server.serveStaticFile(req, "./bestpass/public/login.html");
@@ -39,9 +42,6 @@ server
       headers: { "content-type": "text/html" },
     });
   }, true)
-  .addRoute("GET", "/", async (req) => {
-    return await server.serveStaticFile(req, "./bestpass/public/index.html")
-  })
   .addRoute("GET", "/api/data", async (_req) => {
     return await new Response(JSON.stringify({ message: "Hello, World!"}), {
       headers: { "content-type": "application/json"},
