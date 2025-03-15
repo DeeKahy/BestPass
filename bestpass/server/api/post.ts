@@ -1,4 +1,4 @@
-import { generateToken, genereateGuestToken } from "../../jwt/jwt.ts";
+import { generateRefreshToken, generateToken } from "../../jwt/jwt.ts";
 import { getUserByEmail } from "../../db/db_user.ts";
 import { Role } from "../../acm/permission.ts";
 import { Http } from "../wrapper.ts";
@@ -115,14 +115,27 @@ export async function postLogin(req: Request): Promise<Response> {
   if (user !== null) {
     if (password == user.master_password) {
       console.log("password correct");
-      const token = generateToken(user);
+      const token = generateToken({
+        email: user.email,
+        username: user.username,
+        role: user.role,
+      });
+
+      const refreshToken = generateRefreshToken({
+        email: user.email,
+        username: user.username,
+        role: user.role,
+      });
+
       const redirectUrl = new URL(req.url).searchParams.get("redirect") ||
         "/passwords";
 
-      const headers = new Headers({
-        "Set-Cookie": `jwt=${token}; HttpOnly; Secure; Path=/`,
-        "Location": redirectUrl,
-      });
+        const headers = new Headers({
+          "Location": redirectUrl,
+        });
+  
+        headers.append("Set-Cookie", `jwt=${token}; HttpOnly; Secure; Path=/`);
+        headers.append("Set-Cookie", `refreshToken=${refreshToken}; HttpOnly; Secure; Path=/`);
 
       return new Response(null, {
         status: 302, // 302 redirect
@@ -148,7 +161,10 @@ export async function postLogout(
 ): Promise<Response> {
   // Clear the JWT cookie by setting it to an empty value and making it expire
   const headers = new Headers({
-    "Set-Cookie": "jwt=; HttpOnly; Secure; Path=/; Max-Age=0",
+    "Set-Cookie": [
+      "jwt=; HttpOnly; Secure; Path=/; Max-Age=0;",
+      "refreshToken=; HttpOnly; Secure; Path=/; Max-Age=0;",
+    ].join(", "),
     "Location": "/", // Redirect to login page
   });
 

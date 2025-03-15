@@ -1,7 +1,7 @@
 import { serveFile } from "https://deno.land/std@0.192.0/http/file_server.ts";
 import { DB } from "https://deno.land/x/sqlite@v3.9.0/mod.ts";
 import { Eta } from "https://deno.land/x/eta@v3.5.0/src/index.ts";
-import { verifyToken } from "../jwt/jwt.ts";
+import { verifyToken, generateToken, verifyRefreshToken, generateRefreshToken } from "../jwt/jwt.ts";
 import { Role } from "../acm/permission.ts";
 
 export class Http {
@@ -68,7 +68,7 @@ export class Http {
     const cookies: Record<string, string> = {};
     const cookieHeader = req.headers.get("Cookie");
     if (cookieHeader) {
-      cookieHeader.split(":").forEach((cookie) => {
+      cookieHeader.split(";").forEach((cookie) => {
         const [name, value] = cookie.trim().split("=");
         cookies[name] = value;
       });
@@ -82,13 +82,30 @@ export class Http {
   ): Promise<{ user: { email: string; username: string; role: Role } | null; response?: Response }> {
     const cookies = this.parseCookie(req);
     const token = cookies.jwt;
-    const url = new URL(req.url)
-
+    const refreshToken = cookies.refreshToken;
+    const url = new URL(req.url);
+    
     if (token) {
       try {
         const payload = verifyToken(token);
         return { user: payload };
       } catch (error) {
+        if (error instanceof Error && error.name === "TokenExpiredError" && refreshToken) {
+          try {
+            const refreshPayload = verifyRefreshToken(refreshToken);
+            const newToken = generateToken(refreshPayload);
+            const newRefreshToken = generateRefreshToken(refreshPayload);
+
+            const response = this.redirect(url);
+            response.headers.set("Set-Cookie", `jwt=${newToken}; Path=/; HttpOnly`);
+            response.headers.set("Set-Cookie", `refreshToken=${newRefreshToken}; Path=/; HttpOnly`);
+
+            return { user: refreshPayload, response };
+          } catch (refreshError) {
+            console.error("Invalid refresh token:", refreshError);
+            return { user: null, response: this.redirect(url) };
+          }
+        }
         console.error("Invalid token:", error);
         return { user: null, response: this.redirect(url) };
       }
