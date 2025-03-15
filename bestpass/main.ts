@@ -11,8 +11,8 @@ server
 
     const { user } = await server.authMiddleware(req);
 
-    console.log(user)
-    
+    console.log(user);
+
     if (!token) {
       const guestToken = genereateGuestToken();
       const headers = new Headers({
@@ -20,148 +20,181 @@ server
       });
 
       const data = {
-        user: { isAuthenticated: false}
-      }
-      
+        user: { isAuthenticated: false, name: user?.username },
+      };
+
       const response = await server.renderTemplate("index.eta", data);
       for (const [key, value] of headers.entries()) {
         response.headers.set(key, value);
       }
       return response;
     }
-    
+
     const isAuthenticated = user?.role === "user" || user?.role === "admin";
     const data = {
-      user: { isAuthenticated: isAuthenticated},
-    }
+      user: { isAuthenticated: isAuthenticated, name: user?.username, },
+    };
     // If token exists it just serves the static file like normal
     return await server.renderTemplate("index.eta", data);
   }, false)
+  .addRoute("GET", "/passwords", async (req, user) => {
+    try {
+      // Query all passwords from the database
+      const logins = server.db.query(
+        "SELECT * FROM passwords where passwords.user_email=?",
+        [user?.email],
+      );
+
+      // Ensure logins is an array
+      const validLogins = Array.isArray(logins) ? logins : [];
+
+      const transformedData = validLogins.map((item) => ({
+        website: item[2],
+        username: item[3],
+      }));
+
+      console.log("Transformed Data:", transformedData);
+
+      const dataToRender = {
+        data: transformedData,
+        user: {
+          isAuthenticated: user?.role === "user" || user?.role === "admin",
+          name: user?.username,
+        },
+      };
+
+      const response = server.renderTemplate("passwords.eta", dataToRender);
+      response.headers.set("content-type", "text/html");
+
+      return response;
+    } catch (_error) {
+      return server.redirect(new URL(req.url));
+    }
+  }, true)
   .addRoute("GET", "/login", async (req) => {
     return await server.serveStaticFile(req, "./bestpass/public/login.html");
   })
-  .addRoute("GET", "/passwords", async (req) => {
-    return await server.serveStaticFile(req, "./bestpass/public/passwords.html");
-  }, true)
   .addRoute("GET", "/api/username", async (_req, _user) => {
     return await new Response("<span>Hello, World!</span>", {
       headers: { "content-type": "text/html" },
     });
   }, true)
   .addRoute("GET", "/api/data", async (_req) => {
-    return await new Response(JSON.stringify({ message: "Hello, World!"}), {
-      headers: { "content-type": "application/json"},
+    return await new Response(JSON.stringify({ message: "Hello, World!" }), {
+      headers: { "content-type": "application/json" },
     });
   })
   .addRoute("GET", "/api/username", async (_req) => {
     return await new Response("<span>Hello, World!</span>", {
-      headers: { "content-type": "text/html"},
+      headers: { "content-type": "text/html" },
     });
   })
-  .addRoute("POST", "/api/savenewpassword", async (req, user) =>  {
-    
+  .addRoute("POST", "/api/savenewpassword", async (req, user) => {
     try {
       // Get form data from the request
       const formData = await req.formData();
-  
+
       // Extract password data from the form
       const user_email = user?.email as string;
       const website = formData.get("website") as string | null;
       const username = formData.get("username") as string | null;
       const password = formData.get("password") as string;
-  
+
       // Validate required fields
       if (!user_email || !password) {
-        return new Response(`
+        return new Response(
+          `
           <div class="alert alert-error">
             <span>User email and password are required</span>
           </div>
-        `, {
-          headers: { "content-type": "text/html" }
-        });
+        `,
+          {
+            headers: { "content-type": "text/html" },
+          },
+        );
       }
-  
+
       // Check if user exists
       const userExists = server.db.query(
-        "SELECT email FROM users WHERE email = ?", 
-        [user_email]
+        "SELECT email FROM users WHERE email = ?",
+        [user_email],
       ).length > 0;
-  
+
       if (!userExists) {
-        return new Response(`
+        return new Response(
+          `
           <div class="alert alert-error">
             <span>User does not exist</span>
           </div>
-        `, {
-          headers: { "content-type": "text/html" }
-        });
+        `,
+          {
+            headers: { "content-type": "text/html" },
+          },
+        );
       }
-  
+
       // Insert the new password into the database
       server.db.query(
         "INSERT INTO passwords (user_email, website, username, password) VALUES (?, ?, ?, ?)",
-        [user_email, website || null, username || null, password]
+        [user_email, website || null, username || null, password],
       );
-  
+
       // Return success response
-      return new Response(`
+      return new Response(
+        `
         <div class="alert alert-success">
           <span>Password saved successfully</span>
         </div>
-      `, {
-        headers: { "content-type": "text/html" }
-      });
+      `,
+        {
+          headers: { "content-type": "text/html" },
+        },
+      );
     } catch (error) {
       console.error("Error saving password:", error);
-  
+
       // Return error response
-      return new Response(`
+      return new Response(
+        `
         <div class="alert alert-error">
           <span>Failed to save password</span>
         </div>
-      `, {
-        headers: { "content-type": "text/html" }
-      });
+      `,
+        {
+          headers: { "content-type": "text/html" },
+        },
+      );
     }
   }, true)
-  .addRoute("GET", "/api/logins", async (_req, user) => {
+  .addRoute("GET", "/api/logins", async (_req, user) => { // Route has been made redundant
     try {
       // Query all passwords from the database
-      const logins = server.db.query("SELECT * FROM passwords where passwords.user_email=?", [user?.email]);
+      const logins = server.db.query(
+        "SELECT * FROM passwords where passwords.user_email=?",
+        [user?.email],
+      );
 
-      // Create the complete HTML structure
-      let html = `
-      <ul class="list bg-base-100 rounded-box shadow-md">
-      `;
+      // Ensure logins is an array
+      const validLogins = Array.isArray(logins) ? logins : [];
 
-      // Add each login as a list item
-      for (const login of logins) {
-        const website = login[2] || "No website";
-        const username = login[3] || "No username";
+      const transformedData = validLogins.map((item) => ({
+        website: item[2],
+        username: item[3],
+      }));
 
-        html += `
-        <li class="list-row align-right">
-          <div>
-            <div>${website}</div>
-            <div class="text-xs opacity-60">${username}</div>
-          </div>
-          <button class="btn btn-square btn-ghost">
-            <svg class="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M6 3L20 12 6 21 6 3z"></path></g></svg>
-          </button>
-          <button class="btn btn-square btn-ghost">
-            <svg class="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
-          </button>
-        
-        </li>
-        `;
-      }
+      console.log("Transformed Data:", transformedData);
 
-      // Close the list
-      html += `</ul>`;
+      const dataToRender = {
+        data: transformedData,
+        user: {
+          isAuthenticated: user?.role === "user" || user?.role === "admin",
+        },
+      };
 
-      return await new Response(html, {
-        headers: { "content-type": "text/html" },
-      });
+      const response = server.renderTemplate("passwords.eta", dataToRender);
+      response.headers.set("content-type", "text/html");
+
+      return response;
     } catch (error) {
       console.error("Error fetching logins:", error);
       return await new Response("<div>Error loading logins</div>", {
@@ -186,11 +219,12 @@ server
       if (password == user.master_password) {
         console.log("password correct");
         const token = generateToken(user);
-        const redirectUrl = new URL(req.url).searchParams.get("redirect") || "/passwords";
+        const redirectUrl = new URL(req.url).searchParams.get("redirect") ||
+          "/passwords";
 
         const headers = new Headers({
-          'Set-Cookie': `jwt=${token}; HttpOnly; Secure; Path=/`,
-          'Location': redirectUrl,
+          "Set-Cookie": `jwt=${token}; HttpOnly; Secure; Path=/`,
+          "Location": redirectUrl,
         });
 
         return new Response(null, {
@@ -209,8 +243,8 @@ server
   .addRoute("POST", "/api/logout", async (req, _user) => {
     // Clear the JWT cookie by setting it to an empty value and making it expire
     const headers = new Headers({
-      'Set-Cookie': 'jwt=; HttpOnly; Secure; Path=/; Max-Age=0',
-      'Location': '/login', // Redirect to login page
+      "Set-Cookie": "jwt=; HttpOnly; Secure; Path=/; Max-Age=0",
+      "Location": "/login", // Redirect to login page
     });
 
     return new Response(null, {

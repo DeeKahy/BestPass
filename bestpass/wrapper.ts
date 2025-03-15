@@ -3,6 +3,7 @@ import { DB } from "https://deno.land/x/sqlite@v3.9.0/mod.ts";
 import { Eta } from "https://deno.land/x/eta@v3.5.0/src/index.ts";
 import { verifyToken } from "./jwt/jwt.ts";
 import { Role } from "./acm/permission.ts";
+import { Url } from "node:url";
 
 export class Http {
   handlers: Record<
@@ -91,13 +92,16 @@ export class Http {
         return { user: payload };
       } catch (error) {
         console.error("Invalid token:", error);
-        const redirectUrl = `${url.origin}/login?redirect=${encodeURIComponent(url.pathname)}`;
-        return { user: null, response: Response.redirect(redirectUrl, 302) };
+        return { user: null, response: this.redirect(url) };
       }
     }
 
-    const redirectUrl = `${url.origin}/login?redirect=${encodeURIComponent(url.pathname)}`;
-    return { user: null, response: Response.redirect(redirectUrl, 302) };
+    return { user: null, response: this.redirect(url) };
+  }
+
+  redirect(url: URL): Response {
+    const redirectUrl = `${url.origin}/login?redirect=${encodeURIComponent(url.pathname)}`
+    return Response.redirect(redirectUrl, 302)
   }
 
   serve() {
