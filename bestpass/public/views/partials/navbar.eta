@@ -11,10 +11,18 @@
         </div>
       </div>
       <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+        <% if (it.user.name !== undefined) {%>
         <li><%= it.user.name %></li>
-        <li><a>Settings</a></li>
+        <% } else { %>
+        <li>BestPass</li>
+        <% } %>
         <% if (it.user.isAuthenticated) { %>
-        <li><a href="/logout">Logout</a></li>
+        <li><a>Settings</a></li>
+        <li>
+          <form action="/api/logout" method="post">
+            <button type="submit" class="w-full text-left">Logout</button>
+          </form>
+        </li>
         <% } else { %>
         <li><a href="/login">Login</a></li>
         <% } %>

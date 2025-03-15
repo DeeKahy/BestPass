@@ -1,9 +1,8 @@
 import { serveFile } from "https://deno.land/std@0.192.0/http/file_server.ts";
 import { DB } from "https://deno.land/x/sqlite@v3.9.0/mod.ts";
 import { Eta } from "https://deno.land/x/eta@v3.5.0/src/index.ts";
-import { verifyToken } from "./jwt/jwt.ts";
-import { Role } from "./acm/permission.ts";
-import { Url } from "node:url";
+import { verifyToken } from "../jwt/jwt.ts";
+import { Role } from "../acm/permission.ts";
 
 export class Http {
   handlers: Record<
@@ -11,8 +10,8 @@ export class Http {
     Record<string, (req: Request) => Promise<Response>>
   >;
   staticDir: string;
-  db: DB;
-  eta: Eta;
+  static db: DB;
+  static eta: Eta;
 
   constructor(staticDir: string) {
     this.handlers = {
@@ -22,10 +21,9 @@ export class Http {
       DELETE: {},
     };
     this.staticDir = staticDir;
-    this.db = new DB("password_manager.db");
-    this.eta = new Eta({views: `${staticDir}/views`})
+    Http.db = new DB("password_manager.db");
+    Http.eta = new Eta({views: `${staticDir}/views`})
   }
-
   addRoute(
     method: HttpMethods,
     path: string,
@@ -37,7 +35,7 @@ export class Http {
   ): Http {
     this.handlers[method][path] = async (req: Request) => {
       if (requireAuth) {
-        const { user, response } = await this.authMiddleware(req);
+        const { user, response } = await Http.authMiddleware(req);
         if (!user) {
           return response || new Response("Unauthorized", { status: 401 });
         }
@@ -48,7 +46,7 @@ export class Http {
     return this;
   }
 
-  async serveStaticFile(req: Request, filePath: string): Promise<Response> {
+  static async serveStaticFile(req: Request, filePath: string): Promise<Response> {
     try {
       const response = await serveFile(req, filePath);
       console.log("File served successfully:", filePath);
@@ -59,14 +57,14 @@ export class Http {
     }
   }
 
-  renderTemplate(template: string, data: Record<string, unknown> = {}): Response {
+  static renderTemplate(template: string, data: Record<string, unknown> = {}): Response {
     const rendered = this.eta.render(template, data);
     return new Response(rendered, {
       headers: { "Content-Type": "text/html" },
     });
   }
 
-  parseCookie(req: Request): Record<string, string> {
+  static parseCookie(req: Request): Record<string, string> {
     const cookies: Record<string, string> = {};
     const cookieHeader = req.headers.get("Cookie");
     if (cookieHeader) {
@@ -79,7 +77,7 @@ export class Http {
     return cookies;
   }
 
-  async authMiddleware(
+  static async authMiddleware(
     req: Request,
   ): Promise<{ user: { email: string; username: string; role: Role } | null; response?: Response }> {
     const cookies = this.parseCookie(req);
@@ -99,7 +97,7 @@ export class Http {
     return { user: null, response: this.redirect(url) };
   }
 
-  redirect(url: URL): Response {
+  static redirect(url: URL): Response {
     const redirectUrl = `${url.origin}/login?redirect=${encodeURIComponent(url.pathname)}`
     return Response.redirect(redirectUrl, 302)
   }
@@ -118,7 +116,7 @@ export class Http {
       try {
         const fileInfo = await Deno.stat(filePath);
         if (fileInfo.isFile) {
-          return await this.serveStaticFile(req, filePath);
+          return await Http.serveStaticFile(req, filePath);
         }
       } catch (error) {
         console.error("Error serving file:", error);
