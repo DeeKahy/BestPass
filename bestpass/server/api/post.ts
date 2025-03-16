@@ -192,7 +192,6 @@ export async function postSubmitReview(
   const review = formData.get("review") as string;
   const user_email = user?.email;
 
-  console.log("Receiving review");
 
   try {
     const ratingNumber = Number(rating);
@@ -207,8 +206,6 @@ export async function postSubmitReview(
       review,
       user_email,
     };
-
-    console.log(reviewObj);
 
     Http.db.query(
       "INSERT INTO reviews (user_email, alias, review, rating) VALUES (?, ?, ?, ?)",
