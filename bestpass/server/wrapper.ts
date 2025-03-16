@@ -96,9 +96,11 @@ export class Http {
             const newToken = generateToken(refreshPayload);
             const newRefreshToken = generateRefreshToken(refreshPayload);
 
-            const response = this.redirect(url);
-            response.headers.set("Set-Cookie", `jwt=${newToken}; Path=/; HttpOnly`);
-            response.headers.set("Set-Cookie", `refreshToken=${newRefreshToken}; Path=/; HttpOnly`);
+            const headers = {
+              "Set-Cookie": `jwt=${newToken}; Path=/; Secure; HttpOnly, refreshToken=${newRefreshToken}; Path=/; Secure; HttpOnly`
+            }
+
+            const response = this.redirect(url, headers);
 
             return { user: refreshPayload, response };
           } catch (refreshError) {
@@ -114,9 +116,15 @@ export class Http {
     return { user: null, response: this.redirect(url) };
   }
 
-  static redirect(url: URL): Response {
+  static redirect(url: URL, headers?: HeadersInit): Response {
     const redirectUrl = `${url.origin}/login?redirect=${encodeURIComponent(url.pathname)}`
-    return Response.redirect(redirectUrl, 302)
+    return new Response(null, {
+      status: 302,
+      headers: {
+        ...headers,
+        location: redirectUrl,
+      },
+    });
   }
 
   serve() {
