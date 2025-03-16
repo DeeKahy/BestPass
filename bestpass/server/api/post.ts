@@ -2,6 +2,7 @@ import { generateRefreshToken, generateToken } from "../../jwt/jwt.ts";
 import { getUserByEmail } from "../../db/db_user.ts";
 import { Role } from "../../acm/permission.ts";
 import { Http } from "../wrapper.ts";
+import { readReviews } from "../../db/db_reviews.ts";
 
 /*
 export async function exampleRouteFunction(
@@ -130,12 +131,15 @@ export async function postLogin(req: Request): Promise<Response> {
       const redirectUrl = new URL(req.url).searchParams.get("redirect") ||
         "/passwords";
 
-        const headers = new Headers({
-          "Location": redirectUrl,
-        });
-  
-        headers.append("Set-Cookie", `jwt=${token}; HttpOnly; Secure; Path=/`);
-        headers.append("Set-Cookie", `refreshToken=${refreshToken}; HttpOnly; Secure; Path=/`);
+      const headers = new Headers({
+        "Location": redirectUrl,
+      });
+
+      headers.append("Set-Cookie", `jwt=${token}; HttpOnly; Secure; Path=/`);
+      headers.append(
+        "Set-Cookie",
+        `refreshToken=${refreshToken}; HttpOnly; Secure; Path=/`,
+      );
 
       return new Response(null, {
         status: 302, // 302 redirect
@@ -172,4 +176,83 @@ export async function postLogout(
     status: 302, // 302 redirect
     headers,
   });
+}
+
+export async function postSubmitReview(
+  req: Request,
+  user: {
+    email: string;
+    username: string;
+    role: Role;
+  } | undefined,
+): Promise<Response> {
+  const formData = await req.formData();
+  const alias = formData.get("alias") as string;
+  const rating = formData.get("rating") as string;
+  const review = formData.get("review") as string;
+  const user_email = user?.email;
+
+  console.log("Receiving review");
+
+  try {
+    const ratingNumber = Number(rating);
+
+    if (isNaN(ratingNumber) || ratingNumber < 1 || ratingNumber > 5) {
+      return new Response("Invalid rating value. Must be between 1 and 5.", { status: 400 });
+    }
+
+    const reviewObj = {
+      alias,
+      rating: ratingNumber,
+      review,
+      user_email,
+    };
+
+    console.log(reviewObj);
+
+    Http.db.query(
+      "INSERT INTO reviews (user_email, alias, review, rating) VALUES (?, ?, ?, ?)",
+      [
+        reviewObj.user_email,
+        reviewObj.alias,
+        reviewObj.review,
+        reviewObj.rating,
+      ],
+    );
+
+    const reviews = await readReviews(Http.db);
+
+    // Render the updated reviews section as HTML
+    const reviewsHtml = `
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        ${reviews.map(review => `
+          <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+              <div class="flex items-center space-x-4">
+                <div class="avatar">
+                  <div class="w-12 h-12 rounded-full">
+                    <img src="./images/user.png" alt="User Avatar">
+                  </div>
+                </div>
+                <div>
+                  <h3 class="card-title">${review.alias}</h3>
+                  <div class="flex items-center mt-1">
+                    ${Array.from({ length: 5 }, (_, i) => `
+                      <span class="${i < review.rating ? 'text-yellow-400' : 'text-gray-400'}">★</span>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+              <p class="mt-4">"${review.review}"</p>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    return new Response(reviewsHtml, { status: 200 });
+  } catch (error) {
+    console.error("Failed to add review:", error);
+    return new Response(null, { status: 500 });
+  }
 }

@@ -8,8 +8,8 @@ export type Review = {
     rating: number,
 }
 
-export async function readReviews(db: DB) {
-    const result = db.query("SELECT * FROM reviews LIMIT 10");
+export async function readReviews(db: DB): Promise<Review[]> {
+    const result = await db.query("SELECT * FROM reviews LIMIT 10");
 
     const reviews: Review[] = result.map(([id, user_email, alias, review, rating]) => ({
         id,
@@ -19,5 +19,5 @@ export async function readReviews(db: DB) {
         rating,
     } as Review))
 
-    console.log(reviews);
+    return reviews;
 }

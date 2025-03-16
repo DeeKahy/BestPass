@@ -125,19 +125,19 @@ try {
     const review1 = {
       user_email: "john.doe@example.com",
       alias: "JDoe",
-      review: "Great service!",
+      review: "This password manager has made my life so much easier. Highly recommended",
       rating: 5,
     };
     const review2 = {
       user_email: "jane.smith@example.com",
       alias: "JSmith",
-      review: "Could be better.",
-      rating: 3,
+      review: "I love how easy it is to sync my passwords across all my devices.",
+      rating: 4,
     };
     const review3 = {
       user_email: "john.doe@example.com",
       alias: "JDoe",
-      review: "Very satisfied with the product.",
+      review: "The security features are top-notch. I feel safe using this password manager.",
       rating: 4,
     };
 

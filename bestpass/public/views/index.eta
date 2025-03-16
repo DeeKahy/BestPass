@@ -59,71 +59,92 @@
   <section class="py-20 bg-base-100">
     <div class="container mx-auto px-4">
       <h2 class="text-3xl font-bold text-center mb-12">What Our Users Say</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- Review 1 -->
-        <div class="card bg-base-200 shadow-xl">
-          <div class="card-body">
-            <div class="flex items-center space-x-4">
-              <div class="avatar">
-                <div class="w-12 h-12 rounded-full">
-                  <img src="./images/user.png" alt="User Avatar">
-                </div>
-              </div>
-              <div>
-                <h3 class="card-title">John Doe</h3>
-                <p class="text-sm text-gray-500">Software Engineer</p>
-              </div>
-            </div>
-            <p class="mt-4">"This password manager has made my life so much easier. Highly recommended!"</p>
-          </div>
-        </div>
 
-        <!-- Review 2 -->
-        <div class="card bg-base-200 shadow-xl">
-          <div class="card-body">
-            <div class="flex items-center space-x-4">
-              <div class="avatar">
-                <div class="w-12 h-12 rounded-full">
-                  <img src="./images/user.png" alt="User Avatar">
-                </div>
-              </div>
-              <div>
-                <h3 class="card-title">Jane Smith</h3>
-                <p class="text-sm text-gray-500">Product Manager</p>
-              </div>
-            </div>
-            <p class="mt-4">"I love how easy it is to sync my passwords across all my devices."</p>
-          </div>
-        </div>
+      <div class="text-center mb-8">
+        <button class="btn btn-primary" onclick="review_modal.showModal()">Leave a Review</button>
+      </div>
 
-        <!-- Review 3 -->
-        <div class="card bg-base-200 shadow-xl">
-          <div class="card-body">
-            <div class="flex items-center space-x-4">
-              <div class="avatar">
-                <div class="w-12 h-12 rounded-full">
-                  <img src="./images/user.png" alt="User Avatar">
+      <div id="reviews-section">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <% it.reviews.forEach(function(review) { %>
+          <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+              <div class="flex items-center space-x-4">
+                <div class="avatar">
+                  <div class="w-12 h-12 rounded-full">
+                    <img src="./images/user.png" alt="User Avatar">
+                  </div>
+                </div>
+                <div>
+                  <h3 class="card-title"><%= review.alias %></h3>
+                  <!-- Display the rating as stars -->
+                  <div class="flex items-center mt-1">
+                    <% for (let i = 1; i <= 5; i++) { %>
+                    <% if (i <= review.rating) { %>
+                    <span class="text-yellow-400">★</span> <!-- Filled star -->
+                    <% } else { %>
+                    <span class="text-gray-400">☆</span> <!-- Empty star -->
+                    <% } %>
+                    <% } %>
+                  </div>
                 </div>
               </div>
-              <div>
-                <h3 class="card-title">Mike Johnson</h3>
-                <p class="text-sm text-gray-500">Freelancer</p>
-              </div>
+              <p class="mt-4">"<%= review.review %>"</p>
             </div>
-            <p class="mt-4">"The security features are top-notch. I feel safe using this password manager."
-            </p>
           </div>
+          <% }) %>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="footer footer-center p-10 bg-base-300 text-base-content">
-    <div>
-      <p>© 2023 Password Manager. All rights reserved.</p>
+  <!-- Review Modal -->
+  <dialog id="review_modal" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Leave a Review</h3>
+      <form id="reviewForm"
+            hx-post="/api/submitreview"
+            hx-target="#reviews-section"
+            hx-swap="innerHTML"
+            hx-trigger="submit"
+            hx-on::after-request="review_modal.close()">
+        <!-- Alias Input -->
+        <div class="form-control">
+          <label class="label" for="alias">
+            <span class="label-text">Alias</span>
+          </label>
+          <input type="text" id="alias" name="alias" placeholder="Your alias" class="input input-bordered" required>
+        </div>
+        <!-- Rating Input -->
+        <div class="form-control">
+          <label class="label" for="rating">
+            <span class="label-text">Rating</span>
+          </label>
+          <select id="rating" name="rating" class="select select-bordered" required>
+            <option value="1">1 Star</option>
+            <option value="2">2 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="5">5 Stars</option>
+          </select>
+        </div>
+        <!-- Review Input -->
+        <div class="form-control">
+          <label class="label" for="review">
+            <span class="label-text">Review</span>
+          </label>
+          <textarea id="review" name="review" placeholder="Your review" class="textarea textarea-bordered" required></textarea>
+        </div>
+        <!-- Submit Button -->
+        <div class="modal-action">
+          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="button" class="btn" onclick="review_modal.close()">Close</button>
+        </div>
+      </form>
     </div>
-  </footer>
+  </dialog>
+
+  <%~ include('./partials/footer.eta', it)%>
 
 </body>
 
