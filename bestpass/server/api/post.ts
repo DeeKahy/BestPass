@@ -186,18 +186,49 @@ export async function postSubmitReview(
     role: Role;
   } | undefined,
 ): Promise<Response> {
+  if (!user || user?.role === "guest") {
+    return new Response(
+      `<div id="error-dialog" hx-swap-oob="true">
+        <dialog open class="modal">
+          <div class="modal-box">
+            <h3 class="font-bold text-lg">Error</h3>
+            <p class="py-4">You must be logged in to submit a review.</p>
+            <div class="modal-action">
+              <button class="btn" onclick="this.closest('dialog').close()">Close</button>
+            </div>
+          </div>
+        </dialog>
+      </div>`,
+      { status: 401, headers: { "Content-Type": "text/html", "HX-Retarget": "#error-dialog", "HX-Reswap": "innerHTML" } }
+    );
+  }
+
   const formData = await req.formData();
   const alias = formData.get("alias") as string;
   const rating = formData.get("rating") as string;
   const review = formData.get("review") as string;
-  const user_email = user?.email;
+  const user_email = user.email;
 
+  
 
   try {
     const ratingNumber = Number(rating);
 
     if (isNaN(ratingNumber) || ratingNumber < 1 || ratingNumber > 5) {
-      return new Response("Invalid rating value. Must be between 1 and 5.", { status: 400 });
+      return new Response(
+        `<div id="error-dialog" hx-swap-oob="true">
+          <dialog open class="modal">
+            <div class="modal-box">
+              <h3 class="font-bold text-lg">Error</h3>
+              <p class="py-4">Invalid rating value. Must be between 1 and 5.</p>
+              <div class="modal-action">
+                <button class="btn" onclick="this.closest('dialog').close()">Close</button>
+              </div>
+            </div>
+          </dialog>
+        </div>`,
+        { status: 400, headers: { "Content-Type": "text/html", "HX-Retarget": "#error-dialog", "HX-Reswap": "innerHTML" } }
+      );
     }
 
     const reviewObj = {
@@ -247,9 +278,23 @@ export async function postSubmitReview(
       </div>
     `;
 
-    return new Response(reviewsHtml, { status: 200 });
+    return new Response(reviewsHtml, { status: 200, headers: { "Content-Type": "text/html" } });
   } catch (error) {
     console.error("Failed to add review:", error);
-    return new Response(null, { status: 500 });
+    
+    return new Response(
+      `<div id="error-dialog" hx-swap-oob="true">
+        <dialog open class="modal">
+          <div class="modal-box">
+            <h3 class="font-bold text-lg">Error</h3>
+            <p class="py-4">Something went wrong while submitting your review. Please try again later.</p>
+            <div class="modal-action">
+              <button class="btn" onclick="this.closest('dialog').close()">Close</button>
+            </div>
+          </div>
+        </dialog>
+      </div>`,
+      { status: 500, headers: { "Content-Type": "text/html", "HX-Retarget": "#error-dialog", "HX-Reswap": "innerHTML" } }
+    );
   }
 }
