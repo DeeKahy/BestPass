@@ -96,11 +96,11 @@ export async function getLogin(req: Request): Promise<Response> {
 
 export async function getAdmin(
   req: Request,
-  user: { email: string; username: string; role: Role },
+  user: { email: string; username: string; role: Role } | undefined,
 ): Promise<Response> {
   // Check if user is admin
-  console.log(user.role)
-  if (user.role !== "admin") {
+  console.log(user?.role)
+  if (user?.role !== "admin") {
     return new Response("you are enot admin", { status: 403 });
   }
   

@@ -301,10 +301,10 @@ export async function postSubmitReview(
 
 export async function postCreateUser(
   req: Request,
-  user: { email: string; username: string; role: Role },
+  user: { email: string; username: string; role: Role } | undefined,
 ): Promise<Response> {
   // Check if user is admin
-  if (user.role !== "admin") {
+  if (user?.role !== "admin") {
     return new Response(
       `<div class="alert alert-error">
         <span>Unauthorized: Only admins can create users</span>
