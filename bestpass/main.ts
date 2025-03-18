@@ -16,7 +16,7 @@ server
   .addRoute("GET", "/passwords", getPasswords)
   .addRoute("GET", "/admin", getAdmin)
   .addRoute("POST", "/api/savenewpassword", postSaveNewPassword)
-  .addRoute("POST", "/api/login", postLogin)
+  .addRoute("POST", "/api/login", postLogin, false)
   .addRoute("POST", "/api/logout", postLogout)
   .addRoute("POST", "/api/submitreview", postSubmitReview)
   .addRoute("POST", "/api/admin/createuser", postCreateUser)

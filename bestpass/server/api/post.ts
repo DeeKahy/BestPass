@@ -1,5 +1,5 @@
 import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
-import { generateRefreshToken, generateToken } from "../../jwt/jwt.ts";
+import { generateToken } from "../../jwt/jwt.ts";
 import { getUserByEmail, createUser } from "../../db/db_user.ts";
 import { Role } from "../../acm/permission.ts";
 import { Http } from "../wrapper.ts";
@@ -123,12 +123,6 @@ export async function postLogin(req: Request): Promise<Response> {
         role: user.role,
       });
 
-      const refreshToken = generateRefreshToken({
-        email: user.email,
-        username: user.username,
-        role: user.role,
-      });
-
       const redirectUrl = new URL(req.url).searchParams.get("redirect") ||
         "/passwords";
 
@@ -137,10 +131,6 @@ export async function postLogin(req: Request): Promise<Response> {
       });
 
       headers.append("Set-Cookie", `jwt=${token}; HttpOnly; Secure; Path=/`);
-      headers.append(
-        "Set-Cookie",
-        `refreshToken=${refreshToken}; HttpOnly; Secure; Path=/`,
-      );
 
       return new Response(null, {
         status: 302, // 302 redirect
