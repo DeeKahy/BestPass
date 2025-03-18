@@ -93,3 +93,16 @@ export async function getPasswords(
 export async function getLogin(req: Request): Promise<Response> {
   return await Http.serveStaticFile(req, "./bestpass/public/login.html");
 }
+
+export async function getAdmin(
+  req: Request,
+  user: { email: string; username: string; role: Role },
+): Promise<Response> {
+  // Check if user is admin
+  console.log(user.role)
+  if (user.role !== "admin") {
+    return new Response("you are enot admin", { status: 403 });
+  }
+  
+  return Http.renderTemplate("admin.eta", { user });
+}
