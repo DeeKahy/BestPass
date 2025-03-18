@@ -23,6 +23,15 @@ try {
         FOREIGN KEY (user_email) REFERENCES users(email),
         UNIQUE(user_email, website, username)
       );
+
+      CREATE TABLE IF NOT EXISTS reviews (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_email VARCHAR NOT NULL,
+        alias VARCHAR NOT NULL,
+        review VARCHAR NOT NULL,
+        rating INTEGER NOT NULL,
+        FOREIGN KEY (user_email) REFERENCES users(email)
+      );
     `);
 
   const user1 = {
@@ -35,7 +44,7 @@ try {
     email: "jane.smith@example.com",
     username: "JaneSmith",
     master_password: "janeMasterPass",
-    role: "user",
+    role: "admin",
   };
 
   db.query(
@@ -107,6 +116,65 @@ try {
       password3.password,
     ],
   );
+
+  // Check if there are already 3 or more reviews in the database
+  const reviewCount = db.query("SELECT COUNT(*) as count FROM reviews")[0][0] as number;
+
+  if (reviewCount < 3) {
+    // Insert reviews only if there are fewer than 3 reviews
+    const review1 = {
+      user_email: "john.doe@example.com",
+      alias: "JDoe",
+      review: "This password manager has made my life so much easier. Highly recommended",
+      rating: 5,
+    };
+    const review2 = {
+      user_email: "jane.smith@example.com",
+      alias: "JSmith",
+      review: "I love how easy it is to sync my passwords across all my devices.",
+      rating: 4,
+    };
+    const review3 = {
+      user_email: "john.doe@example.com",
+      alias: "JDoe",
+      review: "The security features are top-notch. I feel safe using this password manager.",
+      rating: 4,
+    };
+
+    db.query(
+      "INSERT OR IGNORE INTO reviews (user_email, alias, review, rating) VALUES (?, ?, ?, ?)",
+      [
+        review1.user_email,
+        review1.alias,
+        review1.review,
+        review1.rating,
+      ],
+    );
+
+    db.query(
+      "INSERT OR IGNORE INTO reviews (user_email, alias, review, rating) VALUES (?, ?, ?, ?)",
+      [
+        review2.user_email,
+        review2.alias,
+        review2.review,
+        review2.rating,
+      ],
+    );
+
+    db.query(
+      "INSERT OR IGNORE INTO reviews (user_email, alias, review, rating) VALUES (?, ?, ?, ?)",
+      [
+        review3.user_email,
+        review3.alias,
+        review3.review,
+        review3.rating,
+      ],
+    );
+
+    console.log("Reviews inserted successfully.");
+  } else {
+    console.log("Skipping review insertion: Already 3 or more reviews in the database.");
+  }
 
   console.log("Data inserted successfully.");
 } catch (error) {

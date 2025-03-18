@@ -1,8 +1,9 @@
-import { generateToken, genereateGuestToken } from "../../jwt/jwt.ts";
+import { genereateGuestToken } from "../../jwt/jwt.ts";
+import { readReviews } from "../../db/db_reviews.ts";
 import { Role } from "../../acm/permission.ts";
 import { Http } from "../wrapper.ts";
 
-/* 
+/*
 export async function exampleRouteFunction(
   req: Request,
   user: {
@@ -18,6 +19,8 @@ export async function getIndex(req: Request): Promise<Response> {
   const cookies = Http.parseCookie(req);
   const token = cookies.jwt;
 
+  const reviews = await readReviews(Http.db);
+
   const { user } = await Http.authMiddleware(req);
 
   if (!token) {
@@ -28,6 +31,7 @@ export async function getIndex(req: Request): Promise<Response> {
 
     const data = {
       user: { isAuthenticated: false, name: user?.username },
+      reviews: reviews,
     };
 
     const response = await Http.renderTemplate("index.eta", data);
@@ -40,6 +44,7 @@ export async function getIndex(req: Request): Promise<Response> {
   const isAuthenticated = user?.role === "user" || user?.role === "admin";
   const data = {
     user: { isAuthenticated: isAuthenticated, name: user?.username },
+    reviews: reviews,
   };
   // If token exists it just serves the static file like normal
   return await Http.renderTemplate("index.eta", data);
@@ -86,5 +91,18 @@ export async function getPasswords(
 }
 
 export async function getLogin(req: Request): Promise<Response> {
-    return await Http.serveStaticFile(req, "./bestpass/public/login.html");
+  return await Http.serveStaticFile(req, "./bestpass/public/login.html");
+}
+
+export async function getAdmin(
+  req: Request,
+  user: { email: string; username: string; role: Role },
+): Promise<Response> {
+  // Check if user is admin
+  console.log(user.role)
+  if (user.role !== "admin") {
+    return new Response("you are enot admin", { status: 403 });
+  }
+  
+  return Http.renderTemplate("admin.eta", { user });
 }
