@@ -31,7 +31,7 @@ export class Http {
       req: Request,
       user?: { email: string; username: string; role: Role },
     ) => Promise<Response>,
-    requireAuth: boolean = false,
+    requireAuth: boolean = true,
   ): Http {
     this.handlers[method][path] = async (req: Request) => {
       if (requireAuth) {
