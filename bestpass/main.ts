@@ -11,13 +11,13 @@ import {
 const server = new Http("./bestpass/public");
 
 server
-  .addRoute("GET", "/", getIndex)
-  .addRoute("GET", "/login", getLogin)
-  .addRoute("GET", "/passwords", getPasswords, true)
-  .addRoute("GET", "/admin", getAdmin, true)
-  .addRoute("POST", "/api/savenewpassword", postSaveNewPassword, true)
-  .addRoute("POST", "/api/login", postLogin)
-  .addRoute("POST", "/api/logout", postLogout, true)
-  .addRoute("POST", "/api/submitreview", postSubmitReview, true)
-  .addRoute("POST", "/api/admin/createuser", postCreateUser, true)
+  .addRoute("GET", "/", getIndex, false)
+  .addRoute("GET", "/login", getLogin, false)
+  .addRoute("GET", "/passwords", getPasswords)
+  .addRoute("GET", "/admin", getAdmin)
+  .addRoute("POST", "/api/savenewpassword", postSaveNewPassword)
+  .addRoute("POST", "/api/login", postLogin, false)
+  .addRoute("POST", "/api/logout", postLogout)
+  .addRoute("POST", "/api/submitreview", postSubmitReview)
+  .addRoute("POST", "/api/admin/createuser", postCreateUser)
   .serve();
