@@ -44,7 +44,7 @@ try {
     email: "jane.smith@example.com",
     username: "JaneSmith",
     master_password: "janeMasterPass",
-    role: "user",
+    role: "admin",
   };
 
   db.query(

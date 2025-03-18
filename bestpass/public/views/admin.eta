@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<%~ include('./partials/head.eta', it) %>
+
+<body class="bg-base-200">
+  <%~ include('./partials/navbar.eta', it) %>
+
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Admin Dashboard</h1>
+    
+    <!-- Create User Form -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title mb-4">Create New User</h2>
+        <form hx-post="/api/admin/createuser" hx-target="#notification-area" hx-swap="innerHTML">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Email</span>
+            </label>
+            <input type="email" name="email" placeholder="user@example.com" class="input input-bordered" required />
+          </div>
+          
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Username</span>
+            </label>
+            <input type="text" name="username" placeholder="username" class="input input-bordered" required />
+          </div>
+          
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Password</span>
+            </label>
+            <input type="password" name="password" placeholder="password" class="input input-bordered" required />
+          </div>
+          
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Role</span>
+            </label>
+            <select name="role" class="select select-bordered" required>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          
+          <div class="form-control mt-6">
+            <button type="submit" class="btn btn-primary">Create User</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Notification Area -->
+    <div id="notification-area" class="toast toast-top toast-end"></div>
+  </div>
+
+  <%~ include('./partials/footer.eta', it) %>
+</body>
+
+</html> 

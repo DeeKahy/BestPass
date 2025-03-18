@@ -1,5 +1,5 @@
 import { generateRefreshToken, generateToken } from "../../jwt/jwt.ts";
-import { getUserByEmail } from "../../db/db_user.ts";
+import { getUserByEmail, createUser } from "../../db/db_user.ts";
 import { Role } from "../../acm/permission.ts";
 import { Http } from "../wrapper.ts";
 import { readReviews } from "../../db/db_reviews.ts";
@@ -295,6 +295,76 @@ export async function postSubmitReview(
         </dialog>
       </div>`,
       { status: 500, headers: { "Content-Type": "text/html", "HX-Retarget": "#error-dialog", "HX-Reswap": "innerHTML" } }
+    );
+  }
+}
+
+export async function postCreateUser(
+  req: Request,
+  user: { email: string; username: string; role: Role } | undefined,
+): Promise<Response> {
+  // Check if user is admin
+  if (user?.role !== "admin") {
+    return new Response(
+      `<div class="alert alert-error">
+        <span>Unauthorized: Only admins can create users</span>
+      </div>`,
+      { status: 403, headers: { "Content-Type": "text/html" } }
+    );
+  }
+
+  try {
+    const formData = await req.formData();
+    const email = formData.get("email") as string;
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
+    const role = formData.get("role") as Role;
+
+    // Validate inputs
+    if (!email || !username || !password || !role) {
+      return new Response(
+        `<div class="alert alert-error">
+          <span>All fields are required</span>
+        </div>`,
+        { status: 400, headers: { "Content-Type": "text/html" } }
+      );
+    }
+
+    // Validate role
+    if (role !== "user" && role !== "admin") {
+      return new Response(
+        `<div class="alert alert-error">
+          <span>Invalid role</span>
+        </div>`,
+        { status: 400, headers: { "Content-Type": "text/html" } }
+      );
+    }
+
+    // Create user
+    const success = await createUser(Http.db, email, username, password, role);
+    
+    if (success) {
+      return new Response(
+        `<div class="alert alert-success">
+          <span>User created successfully</span>
+        </div>`,
+        { status: 200, headers: { "Content-Type": "text/html" } }
+      );
+    } else {
+      return new Response(
+        `<div class="alert alert-error">
+          <span>User already exists</span>
+        </div>`,
+        { status: 400, headers: { "Content-Type": "text/html" } }
+      );
+    }
+  } catch (error) {
+    console.error("Error creating user:", error);
+    return new Response(
+      `<div class="alert alert-error">
+        <span>Error creating user</span>
+      </div>`,
+      { status: 500, headers: { "Content-Type": "text/html" } }
     );
   }
 }
