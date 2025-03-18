@@ -65,6 +65,8 @@ export async function getPasswords(
       [user?.email],
     );
 
+    console.log(user?.email)
+
     // Ensure logins is an array
     const validLogins = Array.isArray(logins) ? logins : [];
 

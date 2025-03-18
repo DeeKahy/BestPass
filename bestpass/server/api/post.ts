@@ -1,3 +1,4 @@
+import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 import { generateRefreshToken, generateToken } from "../../jwt/jwt.ts";
 import { getUserByEmail, createUser } from "../../db/db_user.ts";
 import { Role } from "../../acm/permission.ts";
@@ -114,7 +115,7 @@ export async function postLogin(req: Request): Promise<Response> {
   const user = await getUserByEmail(Http.db, email);
 
   if (user !== null) {
-    if (password == user.master_password) {
+    if (await bcrypt.compare(password, user.master_password)) {
       console.log("password correct");
       const token = generateToken({
         email: user.email,

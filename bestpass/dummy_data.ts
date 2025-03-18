@@ -37,13 +37,13 @@ try {
   const user1 = {
     email: "john.doe@example.com",
     username: "JohnDoe",
-    master_password: "johnMasterPass",
+    master_password: "$2a$10$R9qNH724sfSqjxamvipSeuPEEcq/qN7fu/icRYy4bADqmWqHM0sNW", // johnMasterPass
     role: "user",
   };
   const user2 = {
     email: "jane.smith@example.com",
     username: "JaneSmith",
-    master_password: "janeMasterPass",
+    master_password: "$2a$10$2e0lyPtvuL1wOYZPxFXOQuC0qUTvvyfsKR6hosH.2XhjFsztAqaWW", // janeMasterPass
     role: "admin",
   };
 
